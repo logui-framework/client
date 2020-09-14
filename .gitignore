@@ -1,0 +1,15 @@
+# System databases
+Thumbs.db
+.DS_Store
+
+# Node/npm Specifics
+node_modules/
+.npm
+.env
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
