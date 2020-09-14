@@ -13,3 +13,8 @@ node_modules/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Repository-specific rules
+build/logui.bundle.js
+tests/screenshots
+tests/logui.test.bundle.js
