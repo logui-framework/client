@@ -4,7 +4,7 @@ This Markdown file contains the `CHANGELOG` for the LogUI client library. Change
 
 ```
 
-2020-09-14
+2020-09-14  Version 0.4.0
 
     Implemented basic repository structure, including working build and test environment. Repository ready for the addition of existing library code.
 
