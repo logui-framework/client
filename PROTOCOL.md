@@ -6,6 +6,18 @@ Last Updated | Changed By
 -------------|--------------
 2020-09-15   | David Maxwell
 
+## TODOs
+
+- [x] Outline protocol
+- [x] Provide error codes
+- [ ] Include description of minimum viable event description
+- [ ] Diagram of process
+- [x] WebSocket Connection
+- [x] LogUI Handshake
+- [x] Event Listening
+- [x] Application-Specific Changing
+- [x] WebSocket Disconnection
+
 ## Protocol Stages
 
 The protocol establishes a sequence of stages that take place over the WebSocket connection between the client and server. All exchanges take place via standard WebSocket calls after the HTTP layer establishes a connection.
@@ -14,10 +26,10 @@ The protocol establishes a sequence of stages that take place over the WebSocket
     The LogUI client creates a connection to the LogUI logging endpoint.
 
 2. **LogUI Handshake**
-    Handshake.
+    The handshake that establishes identity.
 
 3. **Event Listening**
-    The server then waits for events and logs them as they are sent by the client.
+    The server then waits for events and logs them as they are sent by the client. The client may also request to update the [application-specific information](#logui-handshake) stored for each logged event.
 
 4. **WebSocket Disconnection**
     Disconnect. The disconnect can be triggered by either the client or the server.
@@ -49,6 +61,7 @@ A complete LogUI handshake request sent by the client, complete with sample data
     "applicationSpecificData": {
         "userID": "exp-user-26",
         "condition": "c2",
+        "askedForHelp": true
     }
 }
 ```
@@ -95,7 +108,7 @@ To give a complete example of `applicationIdentifier`, the above example is encr
 ```
 
 ##### `applicationSpecificData`
-This final field of the handshake again consists of subfields. Here, the developer who is using LogUI can include additional information to be included as part of log events that are specific to the developer's application. For example, the developer may have an application-specific `userID` that they wish to include, or a `condition` field. These values will be stored with each logged event.
+This final field of the handshake again consists of subfields. Here, the developer who is using LogUI can include additional information to be included as part of log events that are specific to the developer's application. For example, the developer may have an application-specific `userID` that they wish to include, or a `condition` or `askedForHelp` field. These values will be stored with each logged event. Nested fields can also be included if this is desired -- the entire set of properties are transferred to each logged event.
 
 If no application-specific fields are required, this field **must** be present; simply present an empty pair of JSON curly braces, like so.
 
@@ -136,29 +149,213 @@ If the handshake request fails for whatever reason, a response is returned that 
 }
 ```
 
-This `messageType` indicates that the handshake failed (`logui-handshake-failure`). A more specific `errorDetails` field is provided with two subfields. Refer to [later in this guide](#logui-server-failure-responses) for more information on error responses.
+This `messageType` indicates that the handshake failed (`logui-handshake-failure`). A more specific `failureDetails` field is provided with two subfields. Refer to [later in this guide](#logui-handshake-failure) for more information on failure responses.
 
 After this response has been sent to the client, the server will close the WebSocket.
 
-
-
-<!-- 2a) If the request is:
-        * badly formed (i.e. missing fields);
-        * has a bad identifier key
-        * is a mismatched version
-    
-    The request is rejected. A response is sent, and the connection is terminated by the server.
-    Library shuts down. -->
-
 ### Event Listening
+
+Event listening is the main stage in LogUI. Interactions that are requested to be logged are gathered by the LogUI client and then sent down the WebSocket connection to the LogUI server in batches. When the LogUI client is ready to send a batch of logged events, it does so with a `logui-event-payload` message.
+
+An example of this message is shown below.
+
+```json
+{
+    "messageType": "logui-event-payload",
+    "events": [
+        {
+            "timestamp": "123456789",
+            "eventName": "click"
+        },
+        {
+            ...
+        },
+        {
+            ...
+        },
+        ...
+    ]
+}
+```
+
+For this message, the type of the aforementioned `logui-event-payload`. The field `events` is an array of events. This array can be of variable length; it can be zero length, which denotes that no events are to be saved from this payload. Events are assumed by the LogUI server to be placed in chronological order (where the earliest event is placed first in the array).
+
+As each `event` that is logged can vary wildly, the fields that are included in each `event` entry are very much open to whatever is required. However, the LogUI server will expect at the very least the following fields to be present for each event logged.
+
+* `timestamp`, representing the UNIX timestamp (using the client's time) for when the event in question occurred.
+* `eventName`, a string representing the name of the event.
+* **TODO** - complete this list as required.
+
+Application-specific data (as provided by `applicationSpecificData`) is bound to each event on the LogUI server before it is committed to data storage.
+
+If any of the required fields listed above are missing, or some other formatting issue is present within the request, the request is counted as a [*bad request*. See a later section on this](#dealing-with-bad-requests).
+
+If the request is successful, the server will respond with a simplistic message, as shown below.
+
+```json
+{
+    "messageType": "logui-events-saved"
+}
+```
+
+This `logui-events-saved` message is an indication that the request has been accepted, and that the events have been successfully stored. As such, the client no longer needs to retain these events in its memory.
+
+### Updating Application-Specific Data
+
+At any stage after a successful handshake, but before the WebSocket connection is closed, the LogUI client may request to change the `applicationSpecificData` that is held for the current session. When a change is requested, all events that are logged will from that point onwards will have the updated set of `applicationSpecificData` applied.
+
+Why would one want to do this? One possible reason could be to capture a change in state within a particular session. If a user is undertaking an experiment for example, a change in `applicationSpecificData` could reflect the fact that they leave a phase providing instructions to a phase that requires them to perform some kind of activity. Providing a field in `applicationSpecificData` could make this easier to track.
+
+As the LogUI client works by sending events to the LogUI server in batch, there may be events present that the client wishes to save with the old `applicationSpecificData` scheme, *before* applying an update. To counter this, this request considers two main payloads: the updated `applicationSpecificData` fields, and a `logui-event-payload`.
+
+An example of this request is shown below.
+
+```json
+{
+    "messageType": "logui-application-specific-data-change",
+    "applicationSpecificDataChanges": {
+        ...,
+        "condition": "c3",
+        "bonus": true,
+        "askedForHelp": null
+        ...
+    },
+    "saveEventsBefore": {
+        "messageType": "logui-event-payload",
+        "events": [
+            {
+                "timestamp": "123456789",
+                "eventName": "click"
+            },
+            ...
+        ]
+    }
+}
+```
+
+This request outlines that the application-specific fields `condition` must be set to `c3`, and `bonus` must be set to `true`. Using the `applicationSpecificData` definition [provided earlier in this guide](#complete-logui-handshake-example), we note that `condition` was already provided (with a value of `c2`). The effect of this latter `logui-application-specific-data-change` is that the value of `condition` is **changed** from `c2` to `c3`. As `bonus` did not exist, it is **created**. Where a field existed but should now be **deleted**, the value should be set to `null`, as shown in the example above for `askedForHelp`.
+
+Setting a field's value to `null` that was not present in the application-specific data beforehand has no effect. If `applicationSpecificDataChanges` is empty, no changes to the application-specific data are made.
+
+The LogUI client should also provide a `saveEventsBefore` field as part of the `logui-application-specific-data-change` request. The expected value for this field is an encapsulated `logui-event-payload` request, complete with `messageType`. [Refer to the appropriate section for more information on what is expected here](#event-listening). To clarify, the `events` array can be empty (i.e. zero-sized), but *it must always be present in the request.* **All events presented here are saved *before* the `applicationSpecificDataChanges` are applied.**
+
+If a valid `logui-application-specific-data-change` request is made, the server will respond with a simplistic acknowledgement. This is to primarily serve notice to the LogUI client that any `events` have been successfully saved, and can be disposed of by the LogUI client.
+
+```json
+{
+    "messageType": "logui-application-specific-data-saved"
+}
+```
+
+If for any reason the request failed, a failure response is issued.
 
 ### WebSocket Disconnection
 
-## LogUI Server Failure Responses
+A WebSocket disconnect can occur on the server-side or the client-side. We take each scenario in turn. By far the most likely occurrence will be a client-side disconnection.
+
+#### Client-Side Disconnection
+
+Client-side disconnections can happen for four main reasons.
+
+1. The user moves away from the page being logged by LogUI, causing the LogUI client library to be unloaded.
+2. The code controlling the LogUI client programmatically instructs the LogUI client to stop.
+3. The user's Internet connection is interrupted.
+4. The user's browser and/or computer crashes.
+
+Not much can be done to recover from the fourth reason. For the third reason, the process is [outlined in this section](#attempting-to-reconnect). However, for the first two reasons, the LogUI client needs to send to the LogUI server any events that it has saved before unloading.
+
+In this eventuality, the LogUI client is expected to send the following request to the LogUI server.
+
+```json
+{
+    "messageType": "logui-client-shutdown",
+    "clientShutdownTimestamp": "641143800",
+    "saveEvents": {
+        "messageType": "logui-event-payload",
+        "events": [
+            {
+                "timestamp": "123456789",
+                "eventName": "click"
+            },
+            ...
+        ]
+    }
+}
+```
+
+The `logui-client-shutdown` request includes a `saveEvents` field, which is itself an encapsulated `logui-event-payload` request. Zero or more `events` can be sent with this request. The `logui-client-shutdown` request also includes a `clientShutdownTimestamp` field, the value of which is the UNIX timestamp (from the client's clock) for the point at which the request is sent.
+
+Upon the receipt of this request, the LogUI server will simply close the connection to the LogUI client. This is considered acknowledgement that the events have been successfully saved, and all loose ends on the LogUI server have been cleared up.
+
+#### Server-Side Disconnection
+
+WebSocket disconnections are initiated by the LogUI server when it is about to be shut down, or dies. Where possible, the LogUI server will send a message alerting any LogUI clients connected to it of the impending shutdown.
+
+```json
+{
+    "messageType": "logui-server-shutdown-alert"
+}
+```
+
+This simple message is then expected to be followed up by a response from the LogUI client. As the server is about to go down, all events that the LogUI client presently has stored need to be flushed to the server. The client should respond in a timely manner with the following request.
+
+```json
+{
+    "messageType": "logui-server-shutdown-acknowledge",
+    "clientShutdownTimestamp": "641143800",
+    "saveEvents": {
+        "messageType": "logui-event-payload",
+        "events": [
+            {
+                "timestamp": "123456789",
+                "eventName": "click"
+            },
+            ...
+        ]
+    }
+}
+```
+
+This request contains a packaged version of a `logui-event-payload` request (via the `saveEvents` field), containing all of the events that the LogUI client requests to be saved. The request also includes a `clientShutdownTimestamp` field, which represents the UNIX timestamp (as per the client's clock) at the point when the request is sent. If the server is still active, the server will save the events, and respond with the following message.
+
+```json
+{
+    "messageType": "logui-server-shutdown-saved"
+}
+```
+
+After this has been received, the LogUI client should expect the LogUI server to close the WebSocket connection.
+
+The `logui-server-shutdown-saved` message serves as confirmation to the LogUI client that the events that were passed were passed as part of the `logui-server-shutdown-acknowledge` request were successfully saved, and can be discarded by the LogUI client.
+
+In the eventuality that the WebSocket connection is closed before receiving this acknowledgement message, the LogUI client **should not assume that the events have been saved.** They should be retained by the client as it attempts to reconnect to the LogUI server.
+
+#### Attempting to Reconnect
+
+If the WebSocket connection was lost (either through the server closing the connection, or through some connection loss), the LogUI client should then continue to log events, storing them client-side temporarily. While the user continues to interact with the page being logged, the LogUI client should attempt to reconnect to the LogUI server every 30 seconds.
+
+If a WebSocket connection is re-established, the LogUI client should undertake the [handshake process](#logui-handshake) once more, taking care to include the `sessionUUID` field within the handshake to ensure continuity with the session being tracked. Immediately after a successful handshake, the LogUI client should send a `logui-event-payload` request to the LogUI server, flushing the buildup of logged events on the client. After this has been acknowledged by the LogUI server, normality can resume.
+
+As mentioned, the LogUI client will continue to log events while the LogUI server is down. However, there is obviously a limit to how much can be stored in the client's memory. This will be measured by the LogUI client, and if a sensible limit is reached before reconnecting to the LogUI server, the LogUI client will have to shut down.
+
+If reconnection to the LogUI server cannot be made before the user leaves the page that they are on, the saved event data is unfortunately lost as there is no way to save it.
+
+*When the browser is closed, all context is lost. If the user closes their browser tab or window, capturing the data when offline becomes an impossible task.*
+
+## Dealing with Bad Requests
+
+If the LogUI client sends a request that the LogUI server does not understand, this is considered to be a **bad request**. A bad request can only occur in the **Event Listening** or **WebSocket Disconnection** stages of the LogUI protocol. If a bad request is sent during the LogUI Handshake stage, this is considered to be a `logui-handshake-failure`. Otherwise, the `messageType` will be a `logui-bad-request`.
+
+Refer to the [following section](#logui-failure-responses) for the possible error messages that can be sent back to the LogUI client in the case of failure.
+
+A total of five bad requests can be made before the server disconnects the LogUI client. After the fifth bad request is made, the LogUI server simply closes the WebSocket connection without any acknowledgement.
+
+## LogUI Failure Responses
+
 If a request sent to the LogUI server results in some kind of failure, the specific failure type is sent back via `messageType`, with details specific to the failure reported in the `errorDetails` field. This contains at least two subfields:
 
-* `errorCode`, reporting a specific failure code (unique to the type of failure); and
-* `terminateConnection`, a boolean indicating whether the failure is severe enough to warrant a closing of the WebSocket.
+- `errorCode`, reporting a specific failure code (unique to the type of failure); and
+- `terminateConnection`, a boolean indicating whether the failure is severe enough to warrant a closing of the WebSocket.
 
 Some failures cannot be recovered from. For example, a `logui-handshake-failure` denotes that the handshake failed. With the authentication process not complete, the LogUI server will not take loggable events. Thus, the WebSocket connection is no longer required. See the example below.
 
@@ -182,231 +379,46 @@ In some failure scenarios, additional metadata about the failure may be present 
 The following subsections report the possible `failureCode` values possible for each failure type.
 
 ### `logui-handshake-failure`
-With this type of failure, the LogUI handshake was not successful. In all scenarios, the WebSocket connection will be terminated. Failure codes `10` through `19` are devoted to this failure type.
 
-* **Code `10` (Generic)**
+With this type of failure, the LogUI handshake was not successful. In all scenarios, the WebSocket connection will be terminated. Failure codes `100` through `109` are devoted to this failure type.
+
+- **Code `100` (Generic)**
     A generic failure code for `logui-handshake-failure`. Not documented here.
 
-* **Code `11` (Badly Formatted)**
+- **Code `101` (Badly Formatted)**
     One or more fields missing from the handshake request.
 
-* **Code `12` (Bad `applicationIdentifier` String)**
+- **Code `102` (Bad `applicationIdentifier` String)**
     An invalid `applicationIdentifier` string was supplied. Decryption failure.
 
-* **Code `13` (Unknown Application or Flight ID)**
+- **Code `103` (Unknown Application or Flight ID)**
     An unknown `applicationID` or `flightID` were supplied. One did not match against the database.
 
-* **Code `14` (Version Mismatch)**
+- **Code `104` (Version Mismatch)**
     A mismatched version was supplied from the `applicationIdentifier` string. A version of the LogUI Client library is being used that does not match with what is expected.
 
-* **Code `15` (Unsupported Client Version)**
+- **Code `105` (Unsupported Client Version)**
     An unsupported LogUI client version is being used with the LogUI server endpoint.
 
+### `logui-bad-request`
 
+A bad request encompasses all eventualities after the handshake stage of the protocol. Failure codes `200` to `209` are devoted to this failure type.
 
-<!-- OLD BELOW
-==================
+- **Code `200` (Generic)**
+    A generic failure code for requests that take place after the handshake stage. Not documented here.
 
-1) Socket connection established.
-    * Endpoint should be specific to the logging library version.
-        i.e. http://127.0.0.1:8081/logui/endpoint/0.4.0/
+- **Code `201` (`logui-event-payload` Badly Formed)**
+    The `logui-event-payload` request is badly formed. Either bad JSON was supplied, or one or more required fields were missing.
 
-2) Client sends handshake request
+- **Code `202` (`logui-event-payload` Missing Field)**
+    One of the `logui-event-payload` event fields were missing. Ensure that the required fields are present for each field.
 
-    * If appSpecificLogData is not required, send empty curly braces.
-    * All four keys must be present.
-    * Identifier object is signed by the server. String converted to dictionary and checked.
-      Key is signed by the server. You need to get a key from the server to log.
-    * The request should also include the domain to check against.
+- **Code `203` (`logui-application-specific-data-change` Badly Formed)**
+    The `logui-application-specific-data-change` request is badly formed. The request contained badly formed JSON, or was missing one or more required fields.
 
-FROM CLIENT
-{
-    'payloadType': 'LogUIHandshake',
-    'sessionUUID':
-    'clientDateTime': 'UNIX TIMESTAMP',
-    'appIdentifier': {
-        appID: 'AppIDString',
-        flightID: 'FlightIDString',
-        clientVersion: '0.4.0'
-    },
-    'appSpecificLogData': {
-        'userID': '123',
-        'condition': '456',
-        'experimentID': 'someID'
-    }
-}
+### `logui-server-failure`
 
-2a) If the request is:
-        * badly formed (i.e. missing fields);
-        * has a bad identifier key
-        * is a mismatched version
-    
-    The request is rejected. A response is sent, and the connection is terminated by the server.
-    Library shuts down.
+A LogUI server failure will almost always entail that the WebSocket connection will be closed. Failure codes `300` to `309` are devoted to this failure type.
 
-FROM SERVER
-{
-    'responseType': 'LogUIHandshakeError',
-    'statusCode': '400',
-    'errorDetails': {
-        'errorString': 'Message for rejection goes here.',
-        'terminate': true
-    }
-}
-
-2b) If the request for logging is valid, and the domain checks out, the connection remains with a success message sent back.
-    From this point, the server is ready to listen to events from the client.
-    Any bad requests from this point are ignored and the connection stays open. Five hits. Five bad requests, connection drops.
-    * We send back a UUID sessionIdentifier that the server is appending to all logged entries.
-
-FROM SERVER
-{
-    'responseType': 'LogUIHandshakeSuccess',
-    'statusCode': '200',
-    'sessionIdentifier': 'uuid code'
-}
-
-    When five hits of invalid requests have been made, we drop the connection with this message.
-
-FROM SERVER
-{
-    'responseType': 'LogUIBadRequestCountExceeded',
-    'statusCode': '402',
-    'errorDetails': {
-        'errorString': 'The number of bad requests has been exceeded.',
-        'terminate': true
-    }
-}
-
-    Before the magic number has been hit, a bad request message is sent.
-    The connection does not drop; this is a warning!
-
-FROM SERVER
-{
-    'responseType': 'LogUIBadRequest',
-    'statusCode': '401',
-    'errorDetails': {
-        'errorString': 'The server did not understand the request.',
-        'terminate': false
-    }
-}
-
-3) If the user wishes to add more appSpecificLogData after the connection has been established, this sequence of events must be followed.
-    * This can also be used to CHANGE the value being used. Provide the new value. If you want to delete one, you provide null as the value.
-    * In the example below, condition is deleted (from '456' above).
-    * We set completedTask to true.
-    * You can use this to manage state on a page, as major events happen.
-
-FROM CLIENT
-{
-    'payloadType': 'LogUIAppSpecificLogDataChange',
-    'appSpecificLogData': {
-        'condition': null,
-        'completedTask': true,
-    }
-}
-
-3a) If the server understands the request (i.e. no LogUIBadRequest), then we receive a confirmation message.
-
-FROM SERVER
-{
-    'responseType': 'LogUIAppSpecificLogDataChangeSuccess',
-    'statusCode': '201'
-}
-
-    * The client does not need to do anything here.
-    * A status code of 201 means nothing needs to be done on the client's side, the message is merely providing an update.
-
-4) When enough data (logged events) has been stored in the buffer, the client needs to send them down the socket in a payload.
-    * EventsToBeLogged is an array of variable length.
-    * The server assumes that the events are stored in chronological order.
-    * The content of each event can vary (for obvious reasons); there are however several fields which are always present.
-        a) clientDateTime
-        b) ...
-
-FROM CLIENT
-{
-    'payloadType': 'LogUIEventPayload',
-    'eventsToBeLogged': [
-        {},
-        {},
-        {},
-        {},...
-    ]
-}
-
-The server processes and stores the events.
-
-4a) If a required field is missing in one or more of the events, the server sends a 403.
-    * This counts towards the bad requests count.
-    * This differs from a 401 as additional information is provided to highlight what the problem was.
-    * Note that this is only sent for the first event that is found to be malformed, if more than one is present.
-
-    * If the payload from the client is missing eventsToBeLogged, a 401 is sent instead. This also counts towards your hit limit.
-
-FROM SERVER
-{
-    'responseType': 'LogUIBadEventPayloadRequest',
-    'statusCode': '403',
-    'errorDetails': {
-        'errorString': 'The event payload was badly formed at position [x].',
-        'badEventData': { /* A copy of the badly formed event object. */ },
-        'terminate': false
-    }
-}
-
-4b) If the events were all correct and stored, we send a success response. This does not need to be acted on.
-
-FROM SERVER
-{
-    'responseType': 'LogUIEventPayloadSuccess',
-    'statusCode': '201'
-}
-
-5) There are two reasons why the client disconnects from the server:
-    * a) because the user moves away from the page, causing the library to be unloaded; or
-    * b) the client programmatically turns the logger off.
-
-    In either case, we need to flush the buffer.
-    As such, we send a LogUIEventPayload event with a 'session' attribute.
-
-    When the server receives and successfully saves this content, it ends the connection.
-    There is no response.
-    The client will be assumed to end the connection from its side once this payload has been sent.
-
-FROM CLIENT
-{
-    'payloadType': 'LogUIEventPayload',
-    'session': 'leavingPage', // Alternatively, 'shutdownClient' is used when the client is programmatically stopped.
-    'eventsToBeLogged': [
-        {},
-        {},
-        {},
-        {},...
-    ]
-}
-
-6) If the server needs to disconnect, for whatever reason, the server will send a LogUIServerShutdown response.
-    * The client should send it's payload over immediatley.
-    * The server can disconnect at any time from that point.
-    * The client should attempt to reconnect according to the reconnect protocol.
-
-FROM SERVER
-{
-    'responseType': 'LogUIServerShutdown',
-    'statusCode': '501',
-}
-
-7) If the server messes up in some other way, we send back a 500.
-    * If the error is severe enough to warrant disconnection, terminate is set to true.
-    * If terminate is not set to true, the client can continue sending data as normal.
-
-FROM SERVER
-{
-    'responseType': 'LogUIServerError',
-    'statusCode': '500',
-    'errorDetails': {
-        'errorString': 'Reason for error here.',
-        'terminate': true
-    }
-} -->
+- **Code `300` (Generic)**
+    A generic LogUI server failure code for events that are not captured by their own identifying failure code.
