@@ -8,6 +8,13 @@ const packageProps = require('./package.json');
 const isProduction = (process.env.NODE_ENV === 'production') ? true : false;
 const buildEnvironment = (process.env.NODE_ENV === 'production') ? 'production' : 'test';
 const uglifyBuild = (process.env.NOUGLIFY == 'true') ? false : true;
+let dispatcherImport = './modules/dispatchers/websocketDispatcher';
+
+switch (process.env.DISPATCHER) {
+    case 'console':
+        dispatcherImport = './modules/dispatchers/consoleDispatcher';
+        break;
+}
 
 export default {
     input: ['./src/main.js'],
@@ -23,6 +30,7 @@ export default {
                 __buildDate__: () => new Date(),
                 __buildVersion__: packageProps.version,
                 __buildEnvironment__: buildEnvironment,
+                __dispatcherImport__: dispatcherImport
             }),
             resolve(),
             commonjs(),
@@ -34,6 +42,7 @@ export default {
                 __buildDate__: () => new Date(),
                 __buildVersion__: packageProps.version,
                 __buildEnvironment__: buildEnvironment,
+                __dispatcherImport__: dispatcherImport
             }),
             resolve(),
             commonjs(),

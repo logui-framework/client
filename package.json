@@ -6,6 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c",
     "build:nouglify": "cross-env NODE_ENV=production NOUGLIFY=true rollup -c",
+    "build:nouglify:console": "cross-env NODE_ENV=production NOUGLIFY=true DISPATCHER=console rollup -c",
     "test": "npm run -s test:build && npm run -s test:run",
     "test:build": "echo '> Building test bundle...' && cross-env NODE-ENV=test rollup -c",
     "test:run": "echo '> Running tests...' && mocha ./tests/modules/*.js --timeout 5000"
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
     "@rollup/plugin-replace": "^2.3.3",
     "chai": "^4.2.0",
     "cross-env": "^7.0.2",
@@ -51,7 +53,5 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.4"
   },
-  "dependencies": {
-    "@babel/preset-env": "^7.11.5"
-  }
+  "dependencies": {}
 }
