@@ -17,12 +17,12 @@ export default (function(root) {
     _public.Dispatcher = Dispatcher;
 
     /* API calls */
-    _public.init = function(configObj) {
-        if (!root.LogUI.Config.init(configObj)) {
+    _public.init = function(configurationObject) {
+        if (!root.LogUI.Config.init(configurationObject)) {
             throw Error('The LogUI configuration component failed to initialise. Check the console for output to see what went wrong.');
         }
 
-        if (!root.LogUI.Dispatcher.init(configObj)) {
+        if (!root.LogUI.Dispatcher.init(configurationObject)) {
             throw Error('The LogUI dispatcher component failed to initialise. Check the console for output to see what went wrong.');
         }
     };
@@ -36,9 +36,7 @@ export default (function(root) {
     };
 
     _public.flushSessionData = function() {
-        console.log("Flush session data; remove UUID");
-        // This should work by deleting any UUID from session storage.
-        // This should work without any instantiation required.
+        Config.clearSessionUUID();
     };
 
     return _public;

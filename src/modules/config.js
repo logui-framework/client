@@ -17,9 +17,13 @@ import RequiredFeatures from '../required';
 export default (function(root) {
     var _public = {};
     var _initTimestamp = null;
-    var _properties = {
+
+    var _applicationIdentifierString = null;
+    var _applicationSpecificData = {};
+    var _trackingConfiguration = {};
+    var _logUIConfigurationProperties = {
         verbose: Defaults.verbose,
-        dispatcher: {},
+        sessionUUID: Defaults.sessionUUID,
     };
 
     var isSupported = function() {
@@ -31,10 +35,21 @@ export default (function(root) {
         }
 
         return true;
-    }
+    };
 
-    _public.getProperty = function(propertyName) {
-        return _properties[propertyName];
+    var initialiseConfigurationObjects = function(configurationObject) {
+        Helpers.extendObject(_logUIConfigurationProperties, Defaults.dispatcher);
+        Helpers.extendObject(_logUIConfigurationProperties, configurationObject.logUIConfiguration);
+
+        _trackingConfiguration = configurationObject.trackingConfiguration;
+        _applicationSpecificData = configurationObject._applicationSpecificData;
+        _applicationIdentifierString = configurationObject._applicationIdentifier;
+
+        return true;
+    };
+
+    _public.getLogUIConfigurationProperty = function(propertyName) {
+        return _logUIConfigurationProperties[propertyName];
     };
 
     _public.getInitTimestamp = function() {
@@ -45,16 +60,24 @@ export default (function(root) {
         return (!!_initTimestamp);
     };
 
-    _public.init = function() {
-        _initTimestamp = new Date();
-
-        return (
-            isSupported() &&
-            true
-        );
+    _public.clearSessionUUID = function() {
+        console.log('clear session uuid!');
     };
 
-    
+    _public.init = function(configurationObject) {
+        _initTimestamp = new Date();
+
+        let initialisationState = (
+            isSupported() &&
+            initialiseConfigurationObjects(configurationObject)
+        );
+
+        if (!initialisationState) {
+            _initTimestamp = null;
+        }
+
+        return initialisationState;
+    };
 
     return _public;
 })(window);

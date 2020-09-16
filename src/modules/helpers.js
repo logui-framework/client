@@ -19,7 +19,7 @@ export default (function(root) {
             currentStateString = ` (${currentState})`;
         }
 
-        if (root.LogUI.Config.getProperty('verbose')) {
+        if (root.LogUI.Config.getLogUIConfigurationProperty('verbose')) {
             var timeDelta = new Date().getTime() - root.LogUI.Config.getInitTimestamp();
             console.log(`LogUI${currentStateString} @ ${timeDelta}ms > ${messageStr}`);
         }
@@ -34,6 +34,16 @@ export default (function(root) {
         while (descendantSplitArray.length && (rootObject = rootObject[descendantSplitArray.shift()]));
 
         return rootObject;
+    };
+
+    _helpers.extendObject = function(objectA, objectB) {
+        for (var key in objectB) {
+            if (objectB.hasOwnProperty(key)) {
+                objectA[key] = objectB[key];
+            }
+        }
+
+        return objectA;
     };
 
     return _helpers;
