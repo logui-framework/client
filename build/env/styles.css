@@ -1,0 +1,89 @@
+html, body {
+    height: 100%;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    line-height: 1.5;
+}
+
+body {
+    /*color: #FFF;
+    background-color: #212121;*/
+}
+
+h1 {
+    margin: 0 auto 0 auto;
+    width: 95%;
+    padding-top: 15px;
+    line-height: 1.2;
+}
+
+    h1 img {
+        float: right;
+        width: 100px;
+    }
+
+div#controls {
+    margin: 25px auto 0 auto;
+    width: 95%;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #4A4A4A;
+    color: #FFF;
+    border-radius: 5px;
+}
+
+    div#controls span#control-container {
+        float: right;
+    }
+
+    div#controls span#control-container span#control-status {
+        font-weight: bold;
+    }
+
+    div#controls span#control-container span#control-version {
+        display: none;
+        padding: 3px;
+        margin-right: 5px;
+        font-size: 10pt;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+    }
+
+main {
+    margin: 0 auto 0 auto;
+    width: 95%;
+    padding-top: 15px;
+}
+
+div#console {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 40%;
+    background-color: #212121;
+    border-top: 1px solid #333;
+    color: #FFF;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 10pt;
+    line-height: 1.6;
+    overflow-y: scroll;
+}
+
+    div#console ul#console-list {
+        margin: 0 auto 0 auto;
+        padding: 10px 0 0 0;
+        width: 95%;
+    }
+
+    div#console ul#console-list li {
+        margin: 0;
+        list-style-type: none;
+        padding: 5px 10px 5px 10px;
+        border-bottom: 1px solid #4A4A4A;
+    }
+
+    div#console ul#console-list li.env {
+        background-color: rgba(0, 114, 198, 0.5);
+    }

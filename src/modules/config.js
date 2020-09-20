@@ -73,7 +73,7 @@ export default (function(root) {
         return _initTimestamp;
     };
 
-    _public.isInit = function() {
+    _public.isActive = function() {
         return (!!_initTimestamp);
     };
 
@@ -95,6 +95,15 @@ export default (function(root) {
         }
 
         return initState;
+    };
+
+    _public.reset = function() {
+        _configProperties = {
+            verbose: Defaults.verbose,
+            sessionUUID: Defaults.sessionUUID
+        };
+
+        _initTimestamp = null;
     };
 
     return _public;

@@ -7,35 +7,66 @@
 
     @module: Page-based Dispatcher
     @author: David Maxwell
-    @date: 2020-09-16
+    @date: 2020-09-20
 */
 
+import Config from '../config';
+import Binder from '../binder';
+import Helpers from '../helpers'
 import Defaults from '../defaults';
+import RequiredFeatures from '../required';
 import ValidationSchemas from '../validationSchemas';
 
 Defaults.dispatcher = {
-    element: '#console',  // The element that the console is rendered in.
-    maxDisplaySize: 100,  // The maximum number of logged events to be shown.
+    consoleElement: null,  // The element that the console is rendered in.
 }
 
-ValidationSchemas.addLogUIConfigProperty('element', 'string');
-ValidationSchemas.addLogUIConfigProperty('maxEventHistory', 'int');
+RequiredFeatures.addFeature('document.createElement');
+RequiredFeatures.addFeature('document.createTextNode');
+
+ValidationSchemas.addLogUIConfigProperty('consoleElement', 'string');
 
 export default (function(root) {
-    // Hello world
     var _public = {};
     _public.dispatcherType = 'console';
+    var consoleElement = null;
 
     _public.init = function() {
-        return true;
+        return (
+            doesConsoleElementExist()
+        );
+    };
+
+    _public.sendObject = function(objToSend) {
+        createElement();
     };
 
     _public.stop = function() {
-
+        return new Promise(resolve => {
+            setTimeout(() => { resolve()}, 2000);
+        });
     };
 
-    _public.requiredAPIs = function() {
-        return [];
+    function doesConsoleElementExist() {
+        let consoleElementString = Config.getConfigProperty('consoleElement');
+        consoleElement = Binder.$(consoleElementString);
+
+        if (!consoleElement) {
+            Helpers.console(`The dispatcher cannot find the specified console element (${consoleElementString}) in the DOM.`, 'Initialisation', true);
+            return false;
+        }
+
+        return true;
+    }
+
+    function createElement() {
+        let newNode = document.createElement('li');
+        let textNode = document.createTextNode('some text from LogUI');
+
+        newNode.appendChild(textNode);
+        consoleElement.insertBefore(newNode, consoleElement.firstChild);
+
+        return newNode;
     }
 
     return _public;

@@ -36,7 +36,9 @@ export default {
             builtins(),
             resolve(),
             commonjs(),
-            babel(),
+            babel({
+                runtimeHelpers: true
+            }),
             uglify(),
         ]: [
             replace({
@@ -49,7 +51,9 @@ export default {
             builtins(),
             resolve(),
             commonjs(),
-            babel(),
+            babel({
+                runtimeHelpers: true
+            }),
         ]
     ]
 }

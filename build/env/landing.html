@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="normalize.css" />
+        <link rel="stylesheet" href="styles.css" />
+        
+        <title>LogUI Test Environment</title>
+    </head>
+
+    <body>
+        <h1>
+            <span>LogUI Test Environment</span>
+            <img src="../../.meta/logui.svg#black" />
+        </h1>
+
+        <div id="controls">
+            <button id="control-start" disabled>Start LogUI</button>
+            <button id="control-stop" disabled>Stop LogUI</button>
+            <button id="control-clear">Clear Console</button>
+            <span id="control-container">
+                <span id="control-version"></span>
+                <span id="control-status">JavaScript disabled!</span>
+            </span>
+        </div>
+
+        <main>
+            <p>This is a simple LogUI test environment. Use this with a build of LogUI and the console dispatcher (<code>npm run -s build:console</code>) to have LogUI drive the console at the bottom of the screen.</p>
+            <p>Control LogUI with the buttons above, and interact with the sample elements below. Interact with the page, too. Try resizing the viewport, or scrolling with your mouse wheel or trackpad. Watch the corresponding log events appear in the console.</p>
+            <p>Note that the events that appear in the console below are the log events that would otherwise be directed to the LogUI server. Check out the browser's console for verbose output on what is going on in terms of initialisation (if <code>verbose: true</code>).</p>
+        </main>
+
+        <div id="console">
+            <ul id="console-list"></ul>
+        </div>
+    </body>
+
+    <script src="controller.js"></script>
+    <script src="../logui.bundle.js"></script>
+    <script>
+        var config = {
+            applicationIdentifier: '????',
+            applicationSpecificData: {
+                userID: 'userIDString',
+                condition: 3,
+                rotation: 1,
+                experimentID: 'experimentIDString',
+            },
+            trackingConfiguration: {
+                
+            },
+            logUIConfiguration: {
+                //endpoint: 'http://127.0.0.1:8000/logUI/endpoint/',
+                consoleElement: '#console-list',
+                verbose: true,
+                sessionUUID: '1234-5678',
+            }
+        };
+    </script>
+</html>
