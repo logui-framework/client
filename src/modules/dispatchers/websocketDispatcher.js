@@ -10,9 +10,9 @@
 */
 
 import Config from '../config';
-import Defaults from '../../defaults';
-import RequiredFeatures from '../../required';
-import ValidationSchemas from '../../validationSchemas';
+import Defaults from '../defaults';
+import RequiredFeatures from '../required';
+import ValidationSchemas from '../validationSchemas';
 
 Defaults.dispatcher = {
     endpoint: null, // The URL of the WebSocket endpoint to send data to.

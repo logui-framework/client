@@ -10,7 +10,7 @@
     @date: 2020-09-16
 */
 
-import Defaults from '../../defaults';
+import Defaults from '../defaults';
 
 Defaults.dispatcher = {
     element: '#console',  // The element that the console is rendered in.

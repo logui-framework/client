@@ -1,4 +1,4 @@
-import Defaults from './defaults';
+import Defaults from './modules/defaults';
 import Config from './modules/config';
 import Helpers from './modules/helpers';
 import Dispatcher from '__dispatcherImport__';

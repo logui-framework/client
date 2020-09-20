@@ -11,9 +11,9 @@
 */
 
 import Helpers from './helpers';
-import ValidationSchemas from '../validationSchemas';
-import Defaults from '../defaults';
-import RequiredFeatures from '../required';
+import ValidationSchemas from './validationSchemas';
+import Defaults from './defaults';
+import RequiredFeatures from './required';
 
 export default (function(root) {
     var _public = {};
