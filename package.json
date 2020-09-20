@@ -7,6 +7,7 @@
     "build": "cross-env NODE_ENV=production rollup -c",
     "build:nouglify": "cross-env NODE_ENV=production NOUGLIFY=true rollup -c",
     "build:nouglify:console": "cross-env NODE_ENV=production NOUGLIFY=true DISPATCHER=console rollup -c",
+    "build:console": "cross-env NODE_ENV=production DISPATCHER=console rollup -c",
     "test": "npm run -s test:build && npm run -s test:run",
     "test:build": "echo '> Building test bundle...' && cross-env NODE-ENV=test rollup -c",
     "test:run": "echo '> Running tests...' && mocha ./tests/modules/*.js --timeout 5000"
