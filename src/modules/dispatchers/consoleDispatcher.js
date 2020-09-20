@@ -18,7 +18,9 @@ Defaults.dispatcher = {
 }
 
 export default (function(root) {
+    // Hello world
     var _public = {};
+    _public.dispatcherType = 'console';
 
     _public.init = function() {
 

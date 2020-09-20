@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import { uglify } from 'rollup-plugin-uglify';
+import builtins from 'rollup-plugin-node-builtins';
 
 const packageProps = require('./package.json');
 const isProduction = (process.env.NODE_ENV === 'production') ? true : false;
@@ -32,6 +33,7 @@ export default {
                 __buildEnvironment__: buildEnvironment,
                 __dispatcherImport__: dispatcherImport
             }),
+            builtins(),
             resolve(),
             commonjs(),
             babel(),
@@ -44,6 +46,7 @@ export default {
                 __buildEnvironment__: buildEnvironment,
                 __dispatcherImport__: dispatcherImport
             }),
+            builtins(),
             resolve(),
             commonjs(),
             babel(),

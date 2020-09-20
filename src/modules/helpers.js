@@ -12,16 +12,21 @@
 export default (function(root) {
     var _helpers = {};
 
-    _helpers.console = function(messageStr, currentState=null) {
+    _helpers.console = function(messageStr, currentState=null, isWarning=false) {
         let currentStateString = '';
+        let consoleFunction = console.log;
 
         if (currentState) {
             currentStateString = ` (${currentState})`;
         }
 
-        if (root.LogUI.Config.getLogUIConfigurationProperty('verbose')) {
+        if (isWarning) {
+            consoleFunction = console.warn;
+        }
+
+        if (root.LogUI.Config.getConfigProperty('verbose') || isWarning) {
             var timeDelta = new Date().getTime() - root.LogUI.Config.getInitTimestamp();
-            console.log(`LogUI${currentStateString} @ ${timeDelta}ms > ${messageStr}`);
+            consoleFunction(`LogUI${currentStateString} @ ${timeDelta}ms > ${messageStr}`);
         }
     };
 

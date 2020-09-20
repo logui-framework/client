@@ -9,9 +9,10 @@
     @date: 2020-09-16
 */
 
-import Defaults from '../../defaults';
 import Config from '../config';
+import Defaults from '../../defaults';
 import RequiredFeatures from '../../required';
+import ValidationSchemas from '../../validationSchemas';
 
 Defaults.dispatcher = {
     endpoint: null, // The URL of the WebSocket endpoint to send data to.
@@ -22,11 +23,14 @@ Defaults.dispatcher = {
 
 RequiredFeatures.addFeature('WebSocket');
 
+ValidationSchemas.addLogUIConfigProperty('endpoint', 'string');
+
 export default (function(root) {
     var _public = {};
+    _public.dispatcherType = 'websocket';
 
     _public.init = function() {
-        console.log(Config.getLogUIConfigurationProperty('sessionUUID'));
+        //console.log(Config.getConfigProperty('sessionUUID'));
         return true;
     };
 

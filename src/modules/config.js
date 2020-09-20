@@ -11,25 +11,26 @@
 */
 
 import Helpers from './helpers';
+import ValidationSchemas from '../validationSchemas';
 import Defaults from '../defaults';
 import RequiredFeatures from '../required';
 
 export default (function(root) {
     var _public = {};
     var _initTimestamp = null;
-
-    var _applicationIdentifierString = null;
-    var _applicationSpecificData = {};
-    var _trackingConfiguration = {};
-    var _logUIConfigurationProperties = {
+    
+    var _appIdentifier = null;
+    var _appSpecificData = {};
+    var _trackingConfig = {};
+    var _configProperties = {
         verbose: Defaults.verbose,
-        sessionUUID: Defaults.sessionUUID,
+        sessionUUID: Defaults.sessionUUID
     };
 
     var isSupported = function() {
         for (const feature of RequiredFeatures.getFeatures()) {
             if (!Helpers.getElementDescendant(root, feature)) {
-                Helpers.console(`The required feature '${feature}' cannot be found; LogUI cannot start!`, 'Initialisation');
+                Helpers.console(`The required feature '${feature}' cannot be found; LogUI cannot start!`, 'Initialisation', true);
                 return false;
             }
         }
@@ -37,26 +38,43 @@ export default (function(root) {
         return true;
     };
 
-    var initialiseConfigurationObjects = function(configurationObject) {
-        Helpers.extendObject(_logUIConfigurationProperties, Defaults.dispatcher);
-        Helpers.extendObject(_logUIConfigurationProperties, configurationObject.logUIConfiguration);
+    var validateSuppliedConfigObject = function(suppliedConfigObject) {
+        let validator = ValidationSchemas.validateSuppliedConfigObject(suppliedConfigObject);
+        
+        if (!validator.valid) {
+            Helpers.console(`The configuration object passed to LogUI was not valid or complete; refer to the warning(s) below for more information.`, 'Initialisation', true);
 
-        _trackingConfiguration = configurationObject.trackingConfiguration;
-        _applicationSpecificData = configurationObject._applicationSpecificData;
-        _applicationIdentifierString = configurationObject._applicationIdentifier;
+            for (let error of validator.errors) {
+                Helpers.console(`> ${error.stack}`, 'Initialisation', true);
+            }
+
+            return false;
+        }
 
         return true;
     };
 
-    _public.getLogUIConfigurationProperty = function(propertyName) {
-        return _logUIConfigurationProperties[propertyName];
+    var initConfigObjects = function(suppliedConfigObject) {
+        Helpers.extendObject(_configProperties, Defaults.dispatcher);  // Apply the defaults for the dispatcher.
+        Helpers.extendObject(_configProperties, suppliedConfigObject.logUIConfiguration);  // Apply the logUIConfiguration values from the supplied config object.
+
+        _appIdentifier = suppliedConfigObject.applicationIdentifier;
+        _appSpecificData = suppliedConfigObject.applicationSpecificData;
+        _trackingConfig = suppliedConfigObject.trackingConfiguration;
+
+        console.log(_appIdentifier);
+        return true;
+    };
+
+    _public.getConfigProperty = function(propertyName) {
+        return _configProperties[propertyName];
     };
 
     _public.getInitTimestamp = function() {
         return _initTimestamp;
     };
 
-    _public.isInitialised = function() {
+    _public.isInit = function() {
         return (!!_initTimestamp);
     };
 
@@ -64,20 +82,36 @@ export default (function(root) {
         console.log('clear session uuid!');
     };
 
-    _public.init = function(configurationObject) {
+    _public.init = function(suppliedConfigObject) {
         _initTimestamp = new Date();
 
-        let initialisationState = (
+        let initState = (
             isSupported() &&
-            initialiseConfigurationObjects(configurationObject)
+            validateSuppliedConfigObject(suppliedConfigObject) &&
+            initConfigObjects(suppliedConfigObject)
         );
 
-        if (!initialisationState) {
+        if (!initState) {
             _initTimestamp = null;
         }
 
-        return initialisationState;
+        return initState;
     };
 
     return _public;
 })(window);
+
+// Think about tidying up the code in the rewrite to better differentiate between the config stuff
+// passed through, and the parts that will be in the dispatcher!
+
+// Rename the variables to shorten them.
+// Rewrite this part. Add in an additional step to validate the input (via a schema) before setting variables.
+// No need for a schema for the elements yet, we will set this up in the later stages of event binding.
+
+// Once validation and variables have been set, I think the dispatcher can be worked on.
+
+// Once the dispatcher has been initialised, we can work on binding the events to elements.
+// Here, we need to iron out the basics of the schema for elements.
+// Ensure that the binding stuff is split into functions as best as possible to ensure that we can call functions again when things change in the DOM.
+
+// Add in the metadata stuff.

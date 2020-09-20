@@ -17,14 +17,19 @@ export default (function(root) {
     _public.Dispatcher = Dispatcher;
 
     /* API calls */
-    _public.init = function(configurationObject) {
-        if (!root.LogUI.Config.init(configurationObject)) {
-            throw Error('The LogUI configuration component failed to initialise. Check the console for output to see what went wrong.');
+    _public.init = function(suppliedConfigObject) {
+        if (!root.LogUI.Config.init(suppliedConfigObject)) {
+            throw Error('The LogUI configuration component failed to initialise. Check console warnings for output to see what went wrong.');
         }
 
-        if (!root.LogUI.Dispatcher.init(configurationObject)) {
-            throw Error('The LogUI dispatcher component failed to initialise. Check the console for output to see what went wrong.');
+        if (!root.LogUI.Dispatcher.init(suppliedConfigObject)) {
+            throw Error('The LogUI dispatcher component failed to initialise. Check console warnings for output to see what went wrong.');
         }
+
+        // Bind aliases for DOM query selectors AFTE the initialisation.
+        // Initialisation confirms that the browser supports them!
+        _public.$ = root.document.querySelector.bind(root.document);
+        _public.$$ = root.document.querySelectorAll.bind(root.document);
     };
 
     _public.stop = function() {
@@ -35,7 +40,7 @@ export default (function(root) {
 
     };
 
-    _public.flushSessionData = function() {
+    _public.clearSessionData = function() {
         Config.clearSessionUUID();
     };
 
