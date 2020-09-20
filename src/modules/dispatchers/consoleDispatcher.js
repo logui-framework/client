@@ -11,11 +11,15 @@
 */
 
 import Defaults from '../defaults';
+import ValidationSchemas from '../validationSchemas';
 
 Defaults.dispatcher = {
     element: '#console',  // The element that the console is rendered in.
     maxDisplaySize: 100,  // The maximum number of logged events to be shown.
 }
+
+ValidationSchemas.addLogUIConfigProperty('element', 'string');
+ValidationSchemas.addLogUIConfigProperty('maxEventHistory', 'int');
 
 export default (function(root) {
     // Hello world
@@ -23,10 +27,10 @@ export default (function(root) {
     _public.dispatcherType = 'console';
 
     _public.init = function() {
-
+        return true;
     };
 
-    _public.disconnect = function() {
+    _public.stop = function() {
 
     };
 

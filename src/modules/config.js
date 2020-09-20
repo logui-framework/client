@@ -61,7 +61,7 @@ export default (function(root) {
         _appIdentifier = suppliedConfigObject.applicationIdentifier;
         _appSpecificData = suppliedConfigObject.applicationSpecificData;
         _trackingConfig = suppliedConfigObject.trackingConfiguration;
-        
+
         return true;
     };
 
@@ -99,15 +99,6 @@ export default (function(root) {
 
     return _public;
 })(window);
-
-// Think about tidying up the code in the rewrite to better differentiate between the config stuff
-// passed through, and the parts that will be in the dispatcher!
-
-// Rename the variables to shorten them.
-// Rewrite this part. Add in an additional step to validate the input (via a schema) before setting variables.
-// No need for a schema for the elements yet, we will set this up in the later stages of event binding.
-
-// Once validation and variables have been set, I think the dispatcher can be worked on.
 
 // Once the dispatcher has been initialised, we can work on binding the events to elements.
 // Here, we need to iron out the basics of the schema for elements.

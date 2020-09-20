@@ -34,7 +34,7 @@ export default (function(root) {
         return true;
     };
 
-    _public.disconnect = function() {
+    _public.stop = function() {
 
     };
     
