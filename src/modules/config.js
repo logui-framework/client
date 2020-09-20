@@ -61,8 +61,7 @@ export default (function(root) {
         _appIdentifier = suppliedConfigObject.applicationIdentifier;
         _appSpecificData = suppliedConfigObject.applicationSpecificData;
         _trackingConfig = suppliedConfigObject.trackingConfiguration;
-
-        console.log(_appIdentifier);
+        
         return true;
     };
 
