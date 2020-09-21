@@ -3,10 +3,10 @@ var LogUITestEnvDriver = (function(root) {
     var initTimestamp = null;
     var detectReference = null;
     
-    const $ = root.document.querySelector.bind(root.document);
-    const $$ = root.document.querySelectorAll.bind(root.document);
+    _public.$ = root.document.querySelector.bind(root.document);
+    _public.$$ = root.document.querySelectorAll.bind(root.document);
 
-    const CONSOLE_LIST_ELEMENT = $('#console-list');
+    const CONSOLE_LIST_ELEMENT = _public.$('#console-list');
 
     const STATUS_MESSAGES = {
         'unloaded': 'LogUI unloaded',
@@ -41,33 +41,33 @@ var LogUITestEnvDriver = (function(root) {
     };
 
     function bindButtonListeners() {
-        $('#control-clear').addEventListener('click', function() {
+        _public.$('#control-clear').addEventListener('click', function() {
             _public.clearConsole();
         });
 
-        $('#control-start').addEventListener('click', function() {
+        _public.$('#control-start').addEventListener('click', function() {
             _public.addEnvMessage('Starting LogUI');
             setStatus('starting');
-            $('#control-start').disabled = true;
+            _public.$('#control-start').disabled = true;
 
             window.LogUI.init(window.config);
         });
 
-        $('#control-stop').addEventListener('click', function() {
+        _public.$('#control-stop').addEventListener('click', function() {
             _public.addEnvMessage('Stopping LogUI');
             setStatus('stopping');
 
-            $('#control-stop').disabled = true;
+            _public.$('#control-stop').disabled = true;
 
             window.LogUI.stop().then(function(resolved) {
-                $('#control-start').disabled = false;
+                _public.$('#control-start').disabled = false;
                 setStatus('inactive');
             });
         });
 
         root.addEventListener('loguistarted', function() {
             if (window.LogUI.isActive()) {
-                $('#control-stop').disabled = false;
+                _public.$('#control-stop').disabled = false;
                 setStatus('active');
                 _public.addEnvMessage('LogUI started; listening for events');
             }
@@ -81,11 +81,11 @@ var LogUITestEnvDriver = (function(root) {
     };
 
     function setStatus(statusKey) {
-        $('#control-status').innerText = STATUS_MESSAGES[statusKey];
+        _public.$('#control-status').innerText = STATUS_MESSAGES[statusKey];
 
         if (statusKey == 'inactive') {
-            $('#control-version').style.display = 'inline';
-            $('#control-version').innerText = `Version ${LogUI.buildVersion}`;
+            _public.$('#control-version').style.display = 'inline';
+            _public.$('#control-version').innerText = `Version ${LogUI.buildVersion}`;
         }
     };
 
@@ -93,7 +93,7 @@ var LogUITestEnvDriver = (function(root) {
         if (window.LogUI) {
             window.clearInterval(detectReference);
             setStatus('inactive');
-            $('#control-start').disabled = false;
+            _public.$('#control-start').disabled = false;
         }
     };
     
@@ -102,4 +102,28 @@ var LogUITestEnvDriver = (function(root) {
 
 document.addEventListener('DOMContentLoaded', function() {
     LogUITestEnvDriver.init();
+
+    LogUITestEnvDriver.$('#test-dommanipulation-button').addEventListener('click', function() {
+        if (this.innerHTML.includes('add')) {
+            var element1 = document.createElement('div');
+            element1.appendChild(document.createTextNode('No binding'))
+            element1.id = 'test-dommanipulation-box1';
+            element1.classList.add('test');
+    
+            var element2 = document.createElement('div');
+            element2.appendChild(document.createTextNode('Hover and click binding'))
+            element2.id = 'test-dommanipulation-box2';
+            element2.classList.add('test');
+    
+            LogUITestEnvDriver.$('#test-dommanipulation-newcontainer').appendChild(element1);
+            LogUITestEnvDriver.$('#test-dommanipulation-newcontainer').appendChild(element2);
+            
+            this.innerHTML = 'Click to destroy elements';
+
+            return;
+        }
+
+        this.innerHTML = 'Click to add two new elements';
+        LogUITestEnvDriver.$('#test-dommanipulation-newcontainer').innerHTML = '';
+    });
 });

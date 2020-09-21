@@ -33,13 +33,20 @@
             <hr />
 
             <div id="elements-container">
-                <div id="container-basic-click" class="group-container">
+                <div id="container-test-click" class="group-container">
                     <h2>Basic Hover/Click Events</h2>
                     <div>
                         <div class="test" id="test-click-box1">Hover!</div>
                         <div class="test" id="test-click-box2">
                             <div class="test" id="test-click-box3">Nested</div>
                         </div>
+                    </div>
+                </div>
+                <div id="container-test-dommanipulation" class="group-container">
+                    <h2>Dynamic DOM Manipulation</h2>
+                    <div>
+                        <button id="test-dommanipulation-button">Click to add two new elements</button>
+                        <div id="test-dommanipulation-newcontainer"></div>
                     </div>
                 </div>
             </div>
@@ -63,7 +70,23 @@
                 experimentID: 'experimentIDString',
             },
             trackingConfiguration: {
-                
+                document: {
+
+                },
+                elements: {
+                    '#test-click-box1': {
+                        'mouseover': {
+                            eventName: 'ELEMENT_MOUSEOVER',
+                            metadata: [
+                                {'source': 'element', 'name': 'someAttribute'}
+                            ],
+                        },
+                        'mouseout': {
+                            sameAs: 'mouseover',
+                            eventName: 'ELEMENT_MOUSEOUT',
+                        }
+                    }
+                }
             },
             logUIConfiguration: {
                 //endpoint: 'http://127.0.0.1:8000/logUI/endpoint/',
