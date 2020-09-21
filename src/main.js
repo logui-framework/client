@@ -1,4 +1,3 @@
-import Defaults from './modules/defaults';
 import Config from './modules/config';
 import Binder from './modules/binder';
 import Helpers from './modules/helpers';
@@ -19,31 +18,33 @@ export default (function(root) {
     _public.Binder = Binder;
 
     /* API calls */
-    _public.init = function(suppliedConfigObject) {
+    _public.init = async function(suppliedConfigObject) {
         if (!suppliedConfigObject) {
             throw Error('LogUI requires a configuration object to be passed to the init() function.');
-            return;
         }
 
         if (!root.LogUI.Config.init(suppliedConfigObject)) {
             throw Error('The LogUI configuration component failed to initialise. Check console warnings for output to see what went wrong.');
         }
 
-        if (!root.LogUI.Dispatcher.init(suppliedConfigObject)) {
+        if (!await root.LogUI.Dispatcher.init(suppliedConfigObject)) {
             throw Error('The LogUI dispatcher component failed to initialise. Check console warnings for output to see what went wrong.');
         }
+        
+        root.dispatchEvent(new Event('loguistarted'));
     };
 
     _public.isActive = function() {
-        return Config.isActive();
+        return (
+            Config.isActive() &&
+            Dispatcher.isActive());
     }
 
     _public.stop = async function() {
         // https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
         let dispatcherPromise = await Dispatcher.stop();
         Config.reset();
-        
-        return true;
+        root.dispatchEvent(new Event('loguistopped'));
     };
 
     _public.updateApplicationSpecificData = function(appSpecificObject) {

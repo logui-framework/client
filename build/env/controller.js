@@ -2,12 +2,10 @@ var LogUITestEnvDriver = (function(root) {
     var _public = {};
     var initTimestamp = null;
     var detectReference = null;
-    var startStopReference = null;
     
     const $ = root.document.querySelector.bind(root.document);
     const $$ = root.document.querySelectorAll.bind(root.document);
 
-    const CONFIG_OBJECT = window.config;
     const CONSOLE_LIST_ELEMENT = $('#console-list');
 
     const STATUS_MESSAGES = {
@@ -53,7 +51,6 @@ var LogUITestEnvDriver = (function(root) {
             $('#control-start').disabled = true;
 
             window.LogUI.init(window.config);
-            startStopReference = window.setInterval(startLogUICompleteCheck, 200);
         });
 
         $('#control-stop').addEventListener('click', function() {
@@ -65,8 +62,21 @@ var LogUITestEnvDriver = (function(root) {
             window.LogUI.stop().then(function(resolved) {
                 $('#control-start').disabled = false;
                 setStatus('inactive');
-                _public.addEnvMessage('LogUI stopped');
             });
+        });
+
+        root.addEventListener('loguistarted', function() {
+            if (window.LogUI.isActive()) {
+                $('#control-stop').disabled = false;
+                setStatus('active');
+                _public.addEnvMessage('LogUI started; listening for events');
+            }
+        });
+
+        // This listener is bound to demonstrate its functionality.
+        // We could equally put this code in the .stop().then() call above.
+        root.addEventListener('loguistopped', function() {
+            _public.addEnvMessage('LogUI stopped');
         });
     };
 
@@ -84,15 +94,6 @@ var LogUITestEnvDriver = (function(root) {
             window.clearInterval(detectReference);
             setStatus('inactive');
             $('#control-start').disabled = false;
-        }
-    };
-
-    function startLogUICompleteCheck() {
-        if (window.LogUI.isActive()) {
-            window.clearInterval(startStopReference);
-            $('#control-stop').disabled = false;
-            setStatus('active');
-            _public.addEnvMessage('LogUI started; listening for events');
         }
     };
     

@@ -29,13 +29,26 @@ ValidationSchemas.addLogUIConfigProperty('consoleElement', 'string');
 export default (function(root) {
     var _public = {};
     _public.dispatcherType = 'console';
-    var consoleElement = null;
+    var _isActive = false;
+    var _consoleElement = null;
 
-    _public.init = function() {
-        return (
-            doesConsoleElementExist()
-        );
+    _public.init = async function() {
+        return new Promise(function(resolve) {
+            let initState = (
+                doesConsoleElementExist()
+            );
+
+            if (initState) {
+                _isActive = true;
+            };
+
+            resolve(initState);
+        });
     };
+
+    _public.isActive = function() {
+        return _isActive;
+    }
 
     _public.sendObject = function(objToSend) {
         createElement();
@@ -43,15 +56,15 @@ export default (function(root) {
 
     _public.stop = function() {
         return new Promise(resolve => {
-            setTimeout(() => { resolve()}, 2000);
+            setTimeout(() => {_isActive = false; resolve(true)}, 1000);
         });
     };
 
     function doesConsoleElementExist() {
         let consoleElementString = Config.getConfigProperty('consoleElement');
-        consoleElement = Binder.$(consoleElementString);
+        _consoleElement = Binder.$(consoleElementString);
 
-        if (!consoleElement) {
+        if (!_consoleElement) {
             Helpers.console(`The dispatcher cannot find the specified console element (${consoleElementString}) in the DOM.`, 'Initialisation', true);
             return false;
         }
@@ -64,7 +77,7 @@ export default (function(root) {
         let textNode = document.createTextNode('some text from LogUI');
 
         newNode.appendChild(textNode);
-        consoleElement.insertBefore(newNode, consoleElement.firstChild);
+        _consoleElement.insertBefore(newNode, _consoleElement.firstChild);
 
         return newNode;
     }
