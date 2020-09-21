@@ -29,6 +29,21 @@
             <p>This is a simple LogUI test environment. Use this with a build of LogUI and the console dispatcher (<code>npm run -s build:console</code>) to have LogUI drive the console at the bottom of the screen.</p>
             <p>Control LogUI with the buttons above, and interact with the sample elements below. Interact with the page, too. Try resizing the viewport, or scrolling with your mouse wheel or trackpad. Watch the corresponding log events appear in the console.</p>
             <p>Note that the events that appear in the console below are the log events that would otherwise be directed to the LogUI server. Check out the browser's console for verbose output on what is going on in terms of initialisation (if <code>verbose: true</code>).</p>
+
+            <hr />
+
+            <div id="elements-container">
+                <div id="container-basic-click" class="group-container">
+                    <h2>Basic Hover/Click Events</h2>
+                    <div>
+                        <div class="test" id="test-click-box1">Hover!</div>
+                        <div class="test" id="test-click-box2">
+                            <div class="test" id="test-click-box3">Nested</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <div id="console">

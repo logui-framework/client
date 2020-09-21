@@ -4,9 +4,8 @@ html, body {
     line-height: 1.5;
 }
 
-body {
-    /*color: #FFF;
-    background-color: #212121;*/
+hr {
+    border: 1px solid #333;
 }
 
 h1 {
@@ -56,6 +55,42 @@ main {
     padding-top: 15px;
 }
 
+main div#elements-container {
+    position: relative;
+    column-count: 3;
+    column-gap: 1em;
+    column-fill: auto;
+    -webkit-column-fill: auto;
+    -moz-column-fill: auto;
+    -ms-column-fill: auto;
+    -o-column-fill: auto;
+    margin-top: 20px;
+    padding: 10px;
+    height: 500px;
+    background-color: #EFEFEF;
+    border-radius: 5px;
+    margin-bottom: 35%;
+}
+
+    main div#elements-container h2 {
+        display: inline-block;
+        font-size: 14pt;
+        margin: 0 0 10px 0;
+        padding: 0;
+        border-bottom: 1px solid #4A4A4A;
+    }
+
+    main div#elements-container div.group-container {
+        position: relative;
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    main div#elements-container div.group-container#container-basic-click {
+        min-height: 200px;
+        background: #C0C0C0;
+    }
+
 div#console {
     position: fixed;
     left: 0;
@@ -87,3 +122,32 @@ div#console {
     div#console ul#console-list li.env {
         background-color: rgba(0, 114, 198, 0.5);
     }
+
+/* Styles for individual test components */
+.test {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding: 10px;
+}
+
+div#test-click-box1 {
+    width: 100px;
+    height: 100px;
+    background-color: aquamarine;
+}
+
+div#test-click-box2 {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 50%;
+    height: 40%;
+    background-color: #3366FF;
+}
+
+div#test-click-box3 {
+    width: 50%;
+    height: 75%;
+    float: right;
+    background-color: #FF6600;
+}
