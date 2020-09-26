@@ -64,28 +64,38 @@
         var config = {
             applicationIdentifier: '????',
             applicationSpecificData: {
-                userID: 'userIDString',
+                userID: 'userid',
                 condition: 3,
                 rotation: 1,
                 experimentID: 'experimentIDString',
+                applicationState: {
+                    
+                }
             },
             trackingConfiguration: {
                 document: {
 
                 },
                 elements: {
-                    '#test-click-box1': {
+                    '.test': {
                         'mouseover': {
-                            eventName: 'ELEMENT_MOUSEOVER',
+                            eventName: 'applies to all boxes',
                             metadata: [
                                 {'source': 'element', 'name': 'someAttribute'}
                             ],
                         },
                         'mouseout': {
-                            sameAs: 'mouseover',
-                            eventName: 'ELEMENT_MOUSEOUT',
+                            eventName: 'applies to all boxes'
                         }
-                    }
+                    },
+                    '#test-click-box1': {
+                        'click': {
+                            eventName: 'Unique to box1',
+                            someExtraObj: {
+                                'hello': 'world'
+                            }
+                        },
+                    },
                 }
             },
             logUIConfiguration: {

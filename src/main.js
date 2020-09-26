@@ -2,6 +2,7 @@ import Config from './modules/config';
 import Binder from './modules/binder';
 import Helpers from './modules/helpers';
 import Dispatcher from '__dispatcherImport__';
+import EventHandlers from './modules/eventHandlers';
 
 export default (function(root) {
     var _public = {};
@@ -16,6 +17,7 @@ export default (function(root) {
     _public.Config = Config;
     _public.Dispatcher = Dispatcher;
     _public.Binder = Binder;
+    _public.EventHandlers = EventHandlers;
 
     /* API calls */
     _public.init = async function(suppliedConfigObject) {
@@ -23,12 +25,16 @@ export default (function(root) {
             throw Error('LogUI requires a configuration object to be passed to the init() function.');
         }
 
-        if (!root.LogUI.Config.init(suppliedConfigObject)) {
-            throw Error('The LogUI configuration component failed to initialise. Check console warnings for output to see what went wrong.');
+        if (!Config.init(suppliedConfigObject)) {
+            throw Error('The LogUI configuration component failed to initialise. Check console warnings to see what went wrong.');
         }
 
-        if (!await root.LogUI.Dispatcher.init(suppliedConfigObject)) {
-            throw Error('The LogUI dispatcher component failed to initialise. Check console warnings for output to see what went wrong.');
+        if (!await Dispatcher.init(suppliedConfigObject)) {
+            throw Error('The LogUI dispatcher component failed to initialise. Check console warnings to see what went wrong.');
+        }
+
+        if (!Binder.init(suppliedConfigObject)) {
+            throw Error('The LogUI binder component failed to initialise. Check console warnings to see what went wrong.');
         }
         
         root.dispatchEvent(new Event('loguistarted'));
@@ -42,7 +48,8 @@ export default (function(root) {
 
     _public.stop = async function() {
         // https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
-        let dispatcherPromise = await Dispatcher.stop();
+        Binder.unbind();  // Unbind the dispatcher first to stop any extra events being saved.
+        await Dispatcher.stop();
         Config.reset();
         root.dispatchEvent(new Event('loguistopped'));
     };

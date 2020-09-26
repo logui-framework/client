@@ -3,7 +3,7 @@
     Configuration Module
 
     An IIFE function returning the configuration module for LogUI.
-    Hosts configuration options and a variety of methods that are related to the configuraiton of the library.
+    Hosts configuration options and a variety of methods that are related to the configuration of the library.
 
     @module: Helpers
     @author: David Maxwell
@@ -25,6 +25,35 @@ export default (function(root) {
     var _configProperties = {
         verbose: Defaults.verbose,
         sessionUUID: Defaults.sessionUUID
+    };
+
+    var _domProperties = null; // Used to store properties for DOM elements on the page.
+
+    _public.domProperties = {
+        has: function(element) {
+            return _domProperties.has(element);
+        },
+
+        set: function(element, properties) {
+            _domProperties.set(element, properties);
+        },
+
+        get: function(element) {
+            if (_domProperties.has(element)) {
+                return _domProperties.get(element);
+            }
+            
+            return undefined;
+        },
+
+        reset: function() {
+            if (_public.isActive()) {
+                _domProperties = new WeakMap();
+                return true;
+            }
+
+            return false;
+        }
     };
 
     var isSupported = function() {
@@ -69,6 +98,10 @@ export default (function(root) {
         return _configProperties[propertyName];
     };
 
+    _public.getTrackingConfig = function() {
+        return _trackingConfig;
+    }
+
     _public.getInitTimestamp = function() {
         return _initTimestamp;
     };
@@ -93,6 +126,8 @@ export default (function(root) {
         if (!initState) {
             _initTimestamp = null;
         }
+
+        _domProperties = new WeakMap();
 
         return initState;
     };

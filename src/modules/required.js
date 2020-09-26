@@ -9,6 +9,9 @@ export default (function() {
         'navigator',
         'addEventListener',
         'sessionStorage',
+        'MutationObserver',
+        'WeakMap',
+        'Object',
     ];
 
     _public.getFeatures = function() {

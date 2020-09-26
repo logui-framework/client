@@ -50,7 +50,8 @@ var LogUITestEnvDriver = (function(root) {
             setStatus('starting');
             _public.$('#control-start').disabled = true;
 
-            window.LogUI.init(window.config);
+            window.LogUI.init(window.config)
+                .catch(error => {throw Error(error)});
         });
 
         _public.$('#control-stop').addEventListener('click', function() {

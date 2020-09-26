@@ -84,11 +84,8 @@ main div#elements-container {
         position: relative;
         margin-bottom: 20px;
         padding: 10px;
-    }
-
-    main div#elements-container div.group-container#container-basic-click {
-        min-height: 200px;
-        background: #C0C0C0;
+        background: #C6C6C6;
+        border-radius: 5px;
     }
 
 div#console {
@@ -103,7 +100,7 @@ div#console {
     font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
     font-size: 10pt;
     line-height: 1.6;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
     div#console ul#console-list {
@@ -130,6 +127,10 @@ div#console {
     padding: 10px;
 }
 
+main div#elements-container div.group-container#container-test-click {
+    min-height: 200px;
+}
+
 div#test-click-box1 {
     width: 100px;
     height: 100px;
@@ -150,4 +151,26 @@ div#test-click-box3 {
     height: 75%;
     float: right;
     background-color: #FF6600;
+}
+
+main div#elements-container div.group-container#container-test-dommanipulation {
+    min-height: 200px;
+}
+
+div#test-dommanipulation-box1 {
+    position: relative;
+    top: 15px;
+    width: 100px;
+    height: 100px;
+    float: left;
+    background-color: #F00;
+}
+
+div#test-dommanipulation-box2 {
+    position: relative;
+    top: 15px;
+    width: 160px;
+    height: 120px;
+    float: right;
+    background-color: seagreen;
 }
