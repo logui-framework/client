@@ -125,10 +125,11 @@ export default (function(root) {
 
         if (!initState) {
             _initTimestamp = null;
+
+            return initState;
         }
 
         _domProperties = new WeakMap();
-
         return initState;
     };
 
