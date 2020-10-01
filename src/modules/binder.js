@@ -29,6 +29,7 @@ export default (function(root) {
 
         // WHEN I COME BACK SATURDAY EVENING
         // Then focus on stop functionality.
+        // Add in functionality for document-level events (e.g. resize).
         // Then MutationObserver functionality (iterate over the config object once more)
         
 
@@ -70,6 +71,7 @@ export default (function(root) {
     }
 
     _public.unbind = function() {
+        _eventBindingControl.unbind();
         //_mutationObserver.disconnect();
     };
 
@@ -125,18 +127,41 @@ export default (function(root) {
             return uniqueElements;
         },
 
+        unbind: function() {
+            // The logic to get elements and config events can probably be wrapped in a generator and re-used?
+            let uniqueElements = [];
+            let configElements = Config.getTrackingConfig().elements;
+
+            for (let selector in configElements) {
+                let selectorNodes = _public.$$(selector);
+                let events = configElements[selector];
+
+                for (let i in Object.keys(selectorNodes)) {
+                    let node = selectorNodes[i];
+
+                    for (let event in events) {
+                        _eventBindingControl.unbindListener(node, event);
+                    }
+                }
+            }
+        },
+
         bindListeners: function(uniqueElements) {
             for (let element of uniqueElements) {
                 let eventTypes = Config.domProperties.get(element).properties;
     
                 for (let eventType in eventTypes) {
-                    _eventBindingControl.bindListener(element, eventType)
+                    _eventBindingControl.bindListener(element, eventType);
                 }
             }
         },
 
         bindListener: function(node, eventType) {
             node.addEventListener(eventType, _logUIBindTo);
+        },
+
+        unbindListener: function(node, eventType) {
+            node.removeEventListener(eventType, _logUIBindTo);
         }
         
     };
