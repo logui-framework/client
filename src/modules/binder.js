@@ -20,17 +20,16 @@ export default (function(root) {
     var _mutationObserver = null;
 
     _public.init = function() {
-        let trackingConfig = Config.getTrackingConfig();
-        let uniqueElements = _eventBindingControl.init(trackingConfig.elements);
+        _eventBindingControl.init();
+        _eventBindingControl.bindListeners();
         
-        _eventBindingControl.bindListeners(uniqueElements);
-        //initMutationObserver();
+        _mutationObserverControl.init();
 
 
-        // WHEN I COME BACK SATURDAY EVENING
-        // Then focus on stop functionality.
+        // WHEN I COME BACK!
         // Add in functionality for document-level events (e.g. resize).
         // Then MutationObserver functionality (iterate over the config object once more)
+        // Add custom log event
         
 
         return true;
@@ -55,15 +54,15 @@ export default (function(root) {
         }
     };
 
-    function createNodeEventsConfigObject(templateConfigObject, selector) {
+    function createElementEventsConfigObject(templateConfigObject, selector) {
         let newConfigObject = {
-            properties: {},
+            events: {},
             sourceSelectors: {},
         };
 
-        Helpers.extendObject(newConfigObject.properties, templateConfigObject);
+        Helpers.extendObject(newConfigObject.events, templateConfigObject);
 
-        for (let eventType in newConfigObject.properties) {
+        for (let eventType in newConfigObject.events) {
             newConfigObject.sourceSelectors[eventType] = selector;
         }
 
@@ -72,7 +71,7 @@ export default (function(root) {
 
     _public.unbind = function() {
         _eventBindingControl.unbind();
-        //_mutationObserver.disconnect();
+        _mutationObserverControl.disconnect();
     };
 
     // Provide aliases for the querySelector functions.
@@ -80,75 +79,109 @@ export default (function(root) {
     _public.$ = root.document.querySelector.bind(root.document);
     _public.$$ = root.document.querySelectorAll.bind(root.document);
 
-    var _eventBindingControl = {
-        init: function(elementsConfig) {
-            let uniqueElements = [];
+    /*
+        Yields a generator of all the elements in the DOM matching the present CSS selectors in the user's provided configuration.
 
-            for (let selector in elementsConfig) {
-                let selectorEventsConfig = elementsConfig[selector];
-                let selectorNodes = _public.$$(selector);
-    
-                for (let i in Object.keys(selectorNodes)) {
-                    let node = selectorNodes[i];
-    
-                    if (uniqueElements.indexOf(node) == -1) {
-                        uniqueElements.push(node);
-                    }
-    
-                    if (Config.domProperties.has(node)) {
-                        let nodeEventsConfig = Config.domProperties.get(node);
-    
-                        for (let eventType in selectorEventsConfig) {
-                            if (nodeEventsConfig['sourceSelectors'].hasOwnProperty(eventType)) {
-                                let existingSelector = nodeEventsConfig['sourceSelectors'][eventType];
-    
-                                if (specificityCompare(existingSelector, selector) <= 0) {
-                                    nodeEventsConfig['properties'][eventType] = selectorEventsConfig[eventType];
-                                    nodeEventsConfig['sourceSelectors'][eventType] = selector;
-    
-                                    Config.domProperties.set(node, nodeEventsConfig);
-                                }
-                            }
-                            else {
-                                nodeEventsConfig['properties'][eventType] = selectorEventsConfig[eventType];
-                                nodeEventsConfig['sourceSelectors'][eventType] = selector;
-    
-                                Config.domProperties.set(node, nodeEventsConfig);
+        Yields a generator object which iterates over every element in the DOM that matches the given CSS selectors in the user's provided configuration..
+        Note that an element may be included more than once; the same element can be picked up by more than one selector.
+
+        @yield {object} An object consisting of: element (the Element matched), config (the configuration properties from the matched selector in the user configuration); and selector, a string representing the CSS selector that matched the element.
+    */
+    var elementsGenerator = function*() {
+        let elementsConfig = Config.getTrackingConfig().elements;
+
+        for (let selector in elementsConfig) {
+            let selectorEventsConfig = elementsConfig[selector];
+            let selectedElements = _public.$$(selector);
+
+            for (let i in Object.keys(selectedElements)) {
+                let element = selectedElements[i];
+
+                yield({
+                    element: element,
+                    config: selectorEventsConfig,
+                    selector: selector,
+                });
+            }
+        }
+    }
+
+    /*
+        Yields a generator of all *unique elements* in the DOM that matched against at least one of the CSS selectors in the user's provided configuration.
+
+        @ yield {Element} An Element that is matched from one of the CSS selectors specified by the user.
+    */
+    var uniqueElementsGenerator = function*() {
+        let uniqueElements = [];
+        let selectedElements = elementsGenerator();
+
+        for (let properties of selectedElements) {
+            if (uniqueElements.indexOf(properties.element) == -1) {
+                uniqueElements.push(properties.element);
+
+                yield properties.element;
+            }
+        }
+    }
+
+    var _eventBindingControl = {
+        init: function() {
+            let selectedElements = elementsGenerator();
+
+            for (let properties of selectedElements) {
+                let element = properties.element;
+                let newElementConfig = properties.config;
+                let selector = properties.selector;
+
+                if (Config.domProperties.has(element)) {
+                    let currentElementEventsConfig = Config.domProperties.get(element);
+
+                    for (let eventType in newElementConfig) {
+                        if (currentElementEventsConfig.sourceSelectors.hasOwnProperty(eventType)) {
+                            let existingSelector = currentElementEventsConfig.sourceSelectors[eventType];
+
+                            if (specificityCompare(existingSelector, selector) <= 0) {
+                                currentElementEventsConfig.events[eventType] = newElementConfig[eventType];
+                                currentElementEventsConfig.sourceSelectors[eventType] = selector;
+
+                                Config.domProperties.set(element, currentElementEventsConfig);
                             }
                         }
-                    }
-                    else {
-                        let nodeEventsConfig = createNodeEventsConfigObject(selectorEventsConfig, selector);
-                        Config.domProperties.set(node, nodeEventsConfig);
+                        else {
+                            currentElementEventsConfig.events[eventType] = newElementConfig;
+                            currentElementEventsConfig.sourceSelectors[eventType] = selector;
+
+                            Config.domProperties.set(element, currentElementEventsConfig);
+                        }
                     }
                 }
+                else {
+                    let currentElementEventsConfig = createElementEventsConfigObject(newElementConfig, selector);
+                    Config.domProperties.set(element, currentElementEventsConfig);
+                }
             }
-    
-            return uniqueElements;
         },
 
         unbind: function() {
-            // The logic to get elements and config events can probably be wrapped in a generator and re-used?
-            let uniqueElements = [];
-            let configElements = Config.getTrackingConfig().elements;
+            let selectedElements = uniqueElementsGenerator();
 
-            for (let selector in configElements) {
-                let selectorNodes = _public.$$(selector);
-                let events = configElements[selector];
+            for (let element of selectedElements) {
+                if (element !== undefined) {
+                    let elementLogUIProperties = Config.domProperties.get(element);
+                    let events = elementLogUIProperties.events;
 
-                for (let i in Object.keys(selectorNodes)) {
-                    let node = selectorNodes[i];
-
-                    for (let event in events) {
-                        _eventBindingControl.unbindListener(node, event);
+                    for (let eventType in events) {
+                        _eventBindingControl.unbindListener(element, eventType);
                     }
                 }
             }
         },
 
-        bindListeners: function(uniqueElements) {
+        bindListeners: function() {
+            let uniqueElements = uniqueElementsGenerator();
+            
             for (let element of uniqueElements) {
-                let eventTypes = Config.domProperties.get(element).properties;
+                let eventTypes = Config.domProperties.get(element).events;
     
                 for (let eventType in eventTypes) {
                     _eventBindingControl.bindListener(element, eventType);
@@ -156,12 +189,12 @@ export default (function(root) {
             }
         },
 
-        bindListener: function(node, eventType) {
-            node.addEventListener(eventType, _logUIBindTo);
+        bindListener: function(element, eventType) {
+            element.addEventListener(eventType, _logUIBindTo);
         },
 
-        unbindListener: function(node, eventType) {
-            node.removeEventListener(eventType, _logUIBindTo);
+        unbindListener: function(element, eventType) {
+            element.removeEventListener(eventType, _logUIBindTo);
         }
         
     };
@@ -169,7 +202,7 @@ export default (function(root) {
 
     var _mutationObserverControl = {
         init: function() {
-            _mutationObserver = new MutationObserver(mutationObserverCallback);
+            _mutationObserver = new MutationObserver(_mutationObserverControl.callback);
             let mutationObserverConfig = {
                 attributes: false,
                 childList: true,
@@ -179,13 +212,18 @@ export default (function(root) {
             _mutationObserver.observe(root.document, mutationObserverConfig);
         },
 
+        disconnect: function() {
+            _mutationObserver.disconnect();
+        },
+
         callback: function(mutationList, observer) {
-            let addedNodes = [];
-            let removedNodes = [];
-            
-            for (let entry in mutationList) {
-                entry = mutationList[entry];
-    
+            for (let entry of mutationList) {
+                for (let addedElement of entry.addedNodes) {
+                    if (addedElement.nodeType == 1) {
+                        console.log(addedElement);
+                    }
+                }
+
                 // entry.addedNodes;
                 // entry.removedNodes;
             }
