@@ -52,6 +52,9 @@ export default (function(root) {
 
     _public.sendObject = function(objToSend) {
         createElement();
+        // this literally sends the object. no processing.
+        // just append it to the list.
+        // or in the case of the websocket, sends down the websocket.
     };
 
     _public.stop = function() {

@@ -2,7 +2,7 @@ import Config from './modules/config';
 import Binder from './modules/binder';
 import Helpers from './modules/helpers';
 import Dispatcher from '__dispatcherImport__';
-import EventHandlers from './modules/eventHandlers';
+import EventController from './modules/eventController';
 
 export default (function(root) {
     var _public = {};
@@ -17,7 +17,7 @@ export default (function(root) {
     _public.Config = Config;
     _public.Dispatcher = Dispatcher;
     _public.Binder = Binder;
-    _public.EventHandlers = EventHandlers;
+    _public.EventController = EventController;
 
     /* API calls */
     _public.init = async function(suppliedConfigObject) {
@@ -36,6 +36,10 @@ export default (function(root) {
         if (!Binder.init(suppliedConfigObject)) {
             throw Error('The LogUI binder component failed to initialise. Check console warnings to see what went wrong.');
         }
+
+        if (!EventController.init()) {
+            throw Error('The LogUI event handler controller component failed to initialise. Check console warnings to see what went wrong.');
+        }
         
         root.dispatchEvent(new Event('loguistarted'));
     };
@@ -51,7 +55,12 @@ export default (function(root) {
         Binder.unbind();  // Unbind the dispatcher first to stop any extra events being saved.
         await Dispatcher.stop();
         Config.reset();
+        EventController.stop();
         root.dispatchEvent(new Event('loguistopped'));
+    };
+
+    _public.logCustomMessage = function(message) {
+
     };
 
     _public.updateApplicationSpecificData = function(appSpecificObject) {

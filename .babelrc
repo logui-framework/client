@@ -3,6 +3,7 @@
         "@babel/env"
     ],
     "plugins": [
+        ["import-directory"],
         ["@babel/plugin-transform-runtime", {
           "regenerator": true
         }]
