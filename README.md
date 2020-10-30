@@ -1,5 +1,7 @@
 # LogUI Client <a href="https://www.tudelft.nl"><img align="right" width="100" src="./.meta/tudelft.svg" /></a>
 
+**Note to ECIR reviewers:** We are in the process of refactoring the LogUI code, incorporating the final features as presented in the demonstration paper you are reading. In a few weeks' time, implementation of a beta version will be complete. Implementing a framework of this complexity takes time to get right, and we're sure you'll find the end result beneficial for the community. (2020-10-30)
+
 *LogUI* is a powerful, framework-agnostic client-side JavaScript library that can be used for logging interactions that take place on a webpage. Primarily designed for *Interactive Information Retrieval (IIR)* experiments, LogUI can in theory be used on any page or site that you wish to track fine-grained user interactions with UI components.
 
 Use the LogUI client in tandem with the LogUI server. At the time of writing, a Django implementation is available at [this repository](https://github.com/maxwelld90/logui-server-django/).
