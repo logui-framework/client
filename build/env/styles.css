@@ -52,6 +52,7 @@ div#controls {
 main {
     margin: 0 auto 0 auto;
     width: 95%;
+    min-height: 3000px;
     padding-top: 15px;
 }
 

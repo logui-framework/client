@@ -61,8 +61,41 @@
     <script src="controller.js"></script>
     <script src="../logui.bundle.js"></script>
     <script>
+
+        // LogUI.EventHandlers.somePluginAdded = (function(event) {
+        //     var _public = {};
+        //     var _timestamp = new Date().getTime();
+
+        //     _public.someFn = function() {
+        //         return Config.getTrackingConfig();
+        //     }
+
+        //     function _private() {
+        //         return 2*3;
+        //     }
+
+        //     return _public;
+        // })();
+
         var config = {
-            applicationIdentifier: '????',
+            logUIConfiguration: {
+                //endpoint: 'http://127.0.0.1:8000/logUI/endpoint/',
+                //authenticationToken: '????',
+                consoleElement: '#console-list',
+                verbose: true,
+                sessionUUID: '1234-5678',
+
+                browserEvents: {
+                    eventBubbling: false,
+                    eventsWhileScrolling: true,
+                    URLChanges: true,
+                    contextMenu: true,
+                    pageFocus: false,
+                    trackCursor: true,
+                    cursorUpdateFrequency: 3200,
+                    cursorLeavingPage: true,
+                }
+            },
             applicationSpecificData: {
                 userID: 'userid',
                 condition: 3,
@@ -73,42 +106,38 @@
                 }
             },
             trackingConfiguration: {
-                document: {
-
-                },
-                elements: {
-                    '.test': {
-                        'mouseover': {
-                            eventName: 'applies to all boxes',
-                            metadata: [
-                                {'source': 'element', 'name': 'someAttribute'}
-                            ],
+                'firstComponent': {
+                    selector: '.test',
+                    event: 'mouseHover',
+                    properties: {
+                        bubble: false,
+                        onmouseover: {
+                            eventName: 'COMPONENT_MOUSE_OVER',
                         },
-                        'mouseout': {
-                            eventName: 'applies to all boxes'
-                        },
-                    },
-                    '#control-version': {
-                        'mouseover': {
-                            eventName: 'blah'
+                        onmouseout: {
+                            eventName: 'COMPONENT_MOUSE_OUT',
                         }
                     },
-                    '#test-click-box1': {
-                        'click': {
-                            eventName: 'Unique to box1',
-                            someExtraObj: {
-                                'hello': 'world'
-                            }
-                        },
-                    },
-                }
+                    metadata: [
+                        {
+                            logAs: 'LOG_NAME',
+                            source: 'elementAttribute',
+                            find: 'attributeName'
+                        }
+                    ],
+                },
+
+                'blah': {
+                    selector: '#test-click-box1',
+                    event: 'mouseover',
+                },
+
+
+                'something': {
+                    selector: '#test-dommanipulation-box2',
+                    event: 'somethingelse',
+                },
             },
-            logUIConfiguration: {
-                //endpoint: 'http://127.0.0.1:8000/logUI/endpoint/',
-                consoleElement: '#console-list',
-                verbose: true,
-                sessionUUID: '1234-5678',
-            }
         };
     </script>
 </html>

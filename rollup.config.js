@@ -10,10 +10,12 @@ const isProduction = (process.env.NODE_ENV === 'production') ? true : false;
 const buildEnvironment = (process.env.NODE_ENV === 'production') ? 'production' : 'test';
 const uglifyBuild = (process.env.NOUGLIFY == 'true') ? false : true;
 let dispatcherImport = './modules/dispatchers/websocketDispatcher';
+let dispatcherImportInPackager = './dispatchers/websocketDispatcher';
 
 switch (process.env.DISPATCHER) {
     case 'console':
         dispatcherImport = './modules/dispatchers/consoleDispatcher';
+        dispatcherImportInPackager = './dispatchers/consoleDispatcher';
         break;
 }
 
@@ -31,7 +33,8 @@ export default {
                 __buildDate__: () => new Date(),
                 __buildVersion__: packageProps.version,
                 __buildEnvironment__: buildEnvironment,
-                __dispatcherImport__: dispatcherImport
+                __dispatcherImport__: dispatcherImport,
+                __dispatcherImportInPackager__: dispatcherImportInPackager,
             }),
             builtins(),
             resolve(),
@@ -46,7 +49,8 @@ export default {
                 __buildDate__: () => new Date(),
                 __buildVersion__: packageProps.version,
                 __buildEnvironment__: buildEnvironment,
-                __dispatcherImport__: dispatcherImport
+                __dispatcherImport__: dispatcherImport,
+                __dispatcherImportInPackager__: dispatcherImportInPackager,
             }),
             builtins(),
             resolve(),

@@ -66,7 +66,7 @@ var LogUITestEnvDriver = (function(root) {
             });
         });
 
-        root.addEventListener('loguistarted', function() {
+        root.addEventListener('logUIStarted', function() {
             if (window.LogUI.isActive()) {
                 _public.$('#control-stop').disabled = false;
                 setStatus('active');
@@ -76,7 +76,7 @@ var LogUITestEnvDriver = (function(root) {
 
         // This listener is bound to demonstrate its functionality.
         // We could equally put this code in the .stop().then() call above.
-        root.addEventListener('loguistopped', function() {
+        root.addEventListener('logUIStopped', function() {
             _public.addEnvMessage('LogUI stopped');
         });
     };
