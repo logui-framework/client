@@ -68,6 +68,7 @@ export default (function(root) {
     _public.reset = function() {
         _configProperties = null;
         _initTimestamp = null;
+        _sessionData = null;
 
         _applicationSpecificData = {};
         _trackingConfig = {};
@@ -156,9 +157,9 @@ export default (function(root) {
         },
     };
 
-    _public.getInitTimestamp = function() {
-        return _initTimestamp;
-    };
+    // _public.getInitTimestamp = function() {
+    //     return _initTimestamp;
+    // };
 
     _public.isActive = function() {
         return (!!_initTimestamp);
@@ -168,7 +169,8 @@ export default (function(root) {
         init: function() {
             _sessionData = {
                 IDkey: null,
-                startTimestamp: null,
+                sessionStartTimestamp: null,
+                libraryStartTimestamp: null,
             };
 
             _public.sessionData.getSessionIDKey();
@@ -195,8 +197,17 @@ export default (function(root) {
             _sessionData.IDKey = root.sessionStorage.getItem(LOGUI_SESSION_ID_KEYNAME);
         },
 
-        setStartTimestamp: function(timestamp) {
-            _sessionData.startTimestamp = timestamp;
+        setTimestamps: function(sessionStartTimestamp, libraryLoadTimestamp) {
+            _sessionData.sessionStartTimestamp = sessionStartTimestamp;
+            _sessionData.libraryStartTimestamp = libraryLoadTimestamp;
+        },
+
+        getSessionStartTimestamp: function() {
+            return _sessionData.sessionStartTimestamp;
+        },
+
+        getLibraryStartTimestamp: function() {
+            return _sessionData.libraryStartTimestamp;
         },
     }
 

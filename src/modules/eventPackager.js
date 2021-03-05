@@ -24,6 +24,7 @@ export default (function(root) {
 
     _public.stop = function() {
         root.removeEventListener('logUIStarted', packageLogUIStartedEvent);
+        packageLogUIStopEvent();
     };
 
     _public.packageInteractionEvent = function() {
@@ -31,8 +32,8 @@ export default (function(root) {
         // metadata sourcer has to go here.
     };
 
-    _public.packageBrowserEvent = function(event, eventDetails) {
-        let packageObject = getBasicPackageObject(event);
+    _public.packageBrowserEvent = function(eventDetails) {
+        let packageObject = getBasicPackageObject();
 
         packageObject.eventType = 'browserEvent';
         packageObject.eventDetails = eventDetails;
@@ -49,12 +50,22 @@ export default (function(root) {
         Dispatcher.sendObject({hello: 'start'});
     };
 
-    var getBasicPackageObject = function(event) {
+    var packageLogUIStopEvent = function() {
+        Dispatcher.sendObject({hello: 'stop'});
+    };
+
+    var getBasicPackageObject = function() {
+        let currentTimestamp = new Date();
+        let sessionStartTimestamp = Config.sessionData.getSessionStartTimestamp();
+        let libraryStartTimestamp = Config.sessionData.getLibraryStartTimestamp();
+        
         return {
             eventType: null,
             eventDetails: {},
             timestamps: {
-                fromLoad: event.timeStamp,
+                eventTimestamp: currentTimestamp,
+                sinceSessionStartMillis: currentTimestamp - sessionStartTimestamp,
+                sinceLogUILoadMillis: currentTimestamp - libraryStartTimestamp,
             },
             applicationSpecificData: Config.getApplicationSpecificData(),
         }
@@ -62,3 +73,7 @@ export default (function(root) {
 
     return _public;
 })(window);
+
+// Now it is case of wrapping stuff up properly. We have timestamps.
+// Metadata sourcers
+// Dispatcher for websocket.

@@ -11,6 +11,7 @@
 */
 
 import Config from '../config';
+import EventPackager from '../eventPackager';
 
 export default (function(root) {
     var _handler = {};
@@ -33,8 +34,12 @@ export default (function(root) {
         clearTimeout(_timeoutID);
 
         _timeoutID = setTimeout(() => {
-            console.log(event.target.innerWidth + "x" + event.target.innerHeight);
-            EventPackager.packageBrowserEvent();
+            EventPackager.packageBrowserEvent({
+                type: 'viewportResize',
+                viewportWidth: event.target.innerWidth,
+                viewportHeight: event.target.innerHeight,
+                stringRepr: `${event.target.innerWidth}x${event.target.innerHeight}`,
+            });
         }, 200);
     };
 

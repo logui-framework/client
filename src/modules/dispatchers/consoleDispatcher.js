@@ -87,9 +87,11 @@ export default (function(root) {
     };
 
     function getSessionDetails() {
+        let currentTimestamp = new Date();
+
         if (Config.sessionData.getSessionIDKey()) {
             Config.sessionData.setIDFromSession();
-            Config.sessionData.setStartTimestamp(new Date()); // This date should come from the server when a recognised session ID is given.
+            Config.sessionData.setTimestamps(currentTimestamp, currentTimestamp); // The first date should come from the server (for the session start time).
 
             //return false; // If the server disagrees with the key supplied, you'd return false here to fail the initialisation.
         }
@@ -97,7 +99,7 @@ export default (function(root) {
             // Create a new session.
             // For the websocket dispatcher, we'd send off a blank session ID field, and it will return a new one.
             Config.sessionData.setID('CONSOLE-SESSION-ID'); // ID should come from the server in the websocket dispatcher.
-            Config.sessionData.setStartTimestamp(new Date());
+            Config.sessionData.setTimestamps(currentTimestamp, currentTimestamp);
         }
 
         return true;

@@ -42,6 +42,7 @@ export default (function(root) {
         }
         
         root.dispatchEvent(new Event('logUIStarted'));
+        root.addEventListener('unload', _public.stop);
     };
 
     _public.isActive = function() {
@@ -51,12 +52,14 @@ export default (function(root) {
     }
 
     _public.stop = async function() {
+        root.removeEventListener('unload', _public.stop);
+
         // https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
         DOMHandler.stop();
+        EventHandlerController.stop();
+        EventPackager.stop();
         await Dispatcher.stop();
         Config.reset();
-        EventPackager.stop();
-        EventHandlerController.stop();
         root.dispatchEvent(new Event('logUIStopped'));
     };
 

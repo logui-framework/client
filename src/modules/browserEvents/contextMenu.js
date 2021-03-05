@@ -26,9 +26,9 @@ export default (function(root) {
     };
 
     var callback = function(event) {
-        
-        console.log('context menu fired');
-        EventPackager.packageBrowserEvent();
+        EventPackager.packageBrowserEvent({
+            type: 'contextMenuFired',
+        });
     };
 
     return _handler;

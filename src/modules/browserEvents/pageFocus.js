@@ -30,11 +30,10 @@ export default (function(root) {
     var callback = function(event) {
         let pageHasFocus = (event.type === 'focus');
         
-        // pageHasFocus is true if the user enters the page.
-
-        console.log(pageHasFocus);
-
-        EventPackager.packageBrowserEvent();
+        EventPackager.packageBrowserEvent({
+            type: 'viewportFocusChange',
+            hasFocus: pageHasFocus,
+        });
     };
 
     return _handler;
