@@ -15,7 +15,6 @@ import Helpers from '../helpers'
 import Defaults from '../defaults';
 import RequiredFeatures from '../required';
 import ValidationSchemas from '../validationSchemas';
-import config from '../config';
 
 Defaults.dispatcher = {
     consoleElement: null,  // The element that the console is rendered in.
@@ -78,9 +77,10 @@ export default (function(root) {
 
     function createElement(objToSend) {
         let newNode = document.createElement('li');
-        let textNode = document.createTextNode(JSON.stringify(objToSend));
 
-        newNode.appendChild(textNode);
+        newNode.appendChild(document.createTextNode(objToSend.eventType));
+        newNode.appendChild(document.createElement('br'));
+        newNode.appendChild(document.createTextNode(objToSend.eventDetails.type));
         _consoleElement.insertBefore(newNode, _consoleElement.firstChild);
 
         return newNode;

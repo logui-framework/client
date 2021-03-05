@@ -28,7 +28,14 @@ export default (function(root) {
     };
 
     _public.packageInteractionEvent = function() {
-        Dispatcher.sendObject({hello: 'world'});
+        let toSend = {
+            eventType: 'interaction',
+            eventDetails: {
+                type: 'some event',
+            },
+        };
+
+        Dispatcher.sendObject(toSend);
         // metadata sourcer has to go here.
     };
 
@@ -38,20 +45,33 @@ export default (function(root) {
         packageObject.eventType = 'browserEvent';
         packageObject.eventDetails = eventDetails;
 
-        console.log(packageObject);
+        Dispatcher.sendObject(packageObject);
     };
 
-    _public.packageStatusEvent = function() {
+    _public.packageStatusEvent = function(eventDetails) {
 
     };
 
     var packageLogUIStartedEvent = function(eventDetails) {
+        let toSend = {
+            eventType: 'started',
+            eventDetails: {
+                type: 'started logui',
+            },
+        };
 
-        Dispatcher.sendObject({hello: 'start'});
+        Dispatcher.sendObject(toSend);
     };
 
     var packageLogUIStopEvent = function() {
-        Dispatcher.sendObject({hello: 'stop'});
+        let toSend = {
+            eventType: 'stopped',
+            eventDetails: {
+                type: 'stopped logui',
+            },
+        };
+
+        Dispatcher.sendObject(toSend);
     };
 
     var getBasicPackageObject = function() {

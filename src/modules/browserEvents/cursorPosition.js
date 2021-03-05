@@ -101,16 +101,16 @@ export default (function(root) {
 
     var handleMousePosition = function(event, hasFocus) {
         let returnObject = getBasicTrackingObject(event, hasFocus);
-        returnObject.type = 'cursorTrackingPosition';
-        returnObject.trackingState = 'positionUpdate';
+        returnObject.type = 'cursorTracking';
+        returnObject.trackingType = 'positionUpdate';
 
         EventPackager.packageBrowserEvent(returnObject);
     }
 
     var pageLeaveCallback = function(event) {
         let returnObject = getBasicTrackingObject(event, _hadFocus);
-        returnObject.state = 'cursorTrackingPosition';
-        returnObject.trackingState = 'cursorLeftViewport';
+        returnObject.type = 'cursorTracking';
+        returnObject.trackingType = 'cursorLeftViewport';
 
         intervalTimerClear();
         EventPackager.packageBrowserEvent(returnObject);
@@ -118,7 +118,7 @@ export default (function(root) {
 
     var pageEnterCallback = function(event) {
         let returnObject = getBasicTrackingObject(event, _hadFocus);
-        returnObject.state = 'cursorTrackingPosition';
+        returnObject.type = 'cursorTracking';
         returnObject.trackingState = 'cursorEnteredViewport';
 
         intervalTimerSet();
