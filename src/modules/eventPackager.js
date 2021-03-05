@@ -27,25 +27,29 @@ export default (function(root) {
         packageLogUIStopEvent();
     };
 
-    _public.packageInteractionEvent = function() {
-        let toSend = {
-            eventType: 'interaction',
-            eventDetails: {
-                type: 'some event',
-            },
-        };
+    _public.packageInteractionEvent = function(eventDetails, trackingConfig) {
+        // let toSend = {
+        //     eventType: 'interaction',
+        //     eventDetails: {
+        //         type: 'some event',
+        //     },
+        // };
 
-        Dispatcher.sendObject(toSend);
+        console.log(eventDetails);
+
+        //Dispatcher.sendObject(toSend);
         // metadata sourcer has to go here.
     };
 
-    _public.packageBrowserEvent = function(eventDetails) {
+    _public.packageBrowserEvent = function(eventDetails, trackingConfig) {
         let packageObject = getBasicPackageObject();
 
         packageObject.eventType = 'browserEvent';
         packageObject.eventDetails = eventDetails;
 
-        Dispatcher.sendObject(packageObject);
+        console.log(eventDetails);
+
+        //Dispatcher.sendObject(packageObject);
     };
 
     _public.packageStatusEvent = function(eventDetails) {

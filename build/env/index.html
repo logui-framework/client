@@ -86,7 +86,7 @@
                 sessionUUID: '1234-5678',
 
                 browserEvents: {
-                    eventBubbling: false,
+                    blockEventBubbling: true,
                     eventsWhileScrolling: true,
                     URLChanges: true,
                     contextMenu: true,
@@ -110,12 +110,12 @@
                     selector: '.test',
                     event: 'mouseHover',
                     properties: {
-                        bubble: false,
-                        onmouseover: {
-                            eventName: 'COMPONENT_MOUSE_OVER',
+                        blockEventBubbling: true,
+                        mouseover: {
+                            name: 'COMPONENT_MOUSE_OVER',
                         },
-                        onmouseout: {
-                            eventName: 'COMPONENT_MOUSE_OUT',
+                        mouseout: {
+                            name: 'COMPONENT_MOUSE_OUT',
                         }
                     },
                     metadata: [
@@ -130,13 +130,14 @@
                 'blah': {
                     selector: '#test-click-box1',
                     event: 'mouseover',
+                    name: 'SOME_BLAH_HOVERIN',
                 },
 
 
-                'something': {
-                    selector: '#test-dommanipulation-box2',
-                    event: 'somethingelse',
-                },
+                // 'something': {
+                //     selector: '#test-dommanipulation-box2',
+                //     event: 'somethingelse',
+                // },
             },
         };
     </script>

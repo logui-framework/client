@@ -27,20 +27,22 @@ export default (function(root) {
         let groupName = elementDOMProperties.getEventGroupName(browserEvent.type);
         let trackingConfig = Config.elementTrackingConfig.getElementGroup(groupName);
         let eventHandler = EventHandlerController.getEventHandler(trackingConfig.event);
-
-        let toPackage = _defaultEventCallbackHandler(browserEvent, trackingConfig); 
+        let packageEvent = false;
 
         if (eventHandler) {
-            toPackage = eventHandler.logUIEventCallback(browserEvent, trackingConfig);
+            packageEvent = eventHandler.logUIEventCallback(this, browserEvent, trackingConfig);
+        }
+        else {
+            packageEvent = _defaultEventCallbackHandler(this, browserEvent, trackingConfig);
         }
 
-        if (toPackage) {
-            EventPackager.packageInteractionEvent({}); //
+        if (packageEvent) {
+            EventPackager.packageInteractionEvent(packageEvent, trackingConfig);
         }
     };
 
-    var _defaultEventCallbackHandler = function(browserEvent, trackingConfig) {
-        EventPackager.packageInteractionEvent({}); //
+    var _defaultEventCallbackHandler = function(eventContext, browserEvent, trackingConfig) {
+        EventPackager.packageInteractionEvent({}, trackingConfig);
     };
 
     return _public;

@@ -47,7 +47,7 @@ const SCHEMA_SUPPLIED_CONFIG_LOGUI_BROWSEREVENTS = {
     type: 'object',
     additionalProperties: false,
     properties: {
-        eventBubbling: {'type': 'boolean'},
+        blockEventBubbling: {'type': 'boolean'},
         eventsWhileScrolling: {'type': 'boolean'},
         URLChanges: {'type': 'boolean'},
         contextMenu: {'type': 'boolean'},
