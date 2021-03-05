@@ -33,8 +33,15 @@ export default (function(root) {
 
         // previousPath is the previous URL
         // currentPath is the new URL.
+        
 
-        EventPackager.packageBrowserEvent();
+        // How can this be wrapped up for the function?
+        EventPackager.packageBrowserEvent(
+            event, {
+                event: 'URLChange',
+                previousURL: previousPath,
+                newURL: currentPath,
+            });
     };
 
     return _handler;

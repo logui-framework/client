@@ -25,6 +25,7 @@ export default (function() {
         'Number',
         'WeakMap',
         'Map',
+        'Date',
         'Object',
     ];
 

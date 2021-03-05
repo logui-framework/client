@@ -68,8 +68,12 @@ export default (function(root) {
 
     };
 
-    _public.clearSessionData = function() {
-        Config.clearSessionUUID();
+    _public.clearSessionID = function() {
+        if (_public.isActive()) {
+            throw Error('The session ID can only be reset when the LogUI client is inactive.');
+        }
+
+        Config.sessionData.clearSessionIDKey();
     };
 
     return _public;

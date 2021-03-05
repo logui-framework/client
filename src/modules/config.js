@@ -15,9 +15,13 @@ import ValidationSchemas from './validationSchemas';
 import Defaults from './defaults';
 import RequiredFeatures from './required';
 
+const LOGUI_SESSION_ID_KEYNAME = 'logUI-sessionIDKey';
+
 export default (function(root) {
     var _public = {};
     var _initTimestamp = null;
+
+    var _sessionData = null;
     
     var _applicationSpecificData = {};
     var _trackingConfig = {};
@@ -46,6 +50,7 @@ export default (function(root) {
 
         _DOMProperties = new WeakMap();
         _public.CSSRules.init();
+        _public.sessionData.init();
         return initState;
     };
 
@@ -159,13 +164,41 @@ export default (function(root) {
         return (!!_initTimestamp);
     };
 
-    _public.clearSessionUUID = function() {
-        console.log('clear session uuid!');
-    };
+    _public.sessionData = {
+        init: function() {
+            _sessionData = {
+                IDkey: null,
+                startTimestamp: null,
+            };
 
-    // _public.getBrowserEvents = function() {
-    //     return _browserEvents;
-    // }
+            _public.sessionData.getSessionIDKey();
+        },
+
+        reset: function() {
+            _public.sessionData.init();
+        },
+
+        getSessionIDKey: function() {
+            return root.sessionStorage.getItem(LOGUI_SESSION_ID_KEYNAME);
+        },
+
+        clearSessionIDKey: function() {
+            root.sessionStorage.removeItem(LOGUI_SESSION_ID_KEYNAME);
+        },
+
+        setID: function(newID) {
+            _sessionData.IDkey = newID;
+            root.sessionStorage.setItem(LOGUI_SESSION_ID_KEYNAME, newID);
+        },
+
+        setIDFromSession: function() {
+            _sessionData.IDKey = root.sessionStorage.getItem(LOGUI_SESSION_ID_KEYNAME);
+        },
+
+        setStartTimestamp: function(timestamp) {
+            _sessionData.startTimestamp = timestamp;
+        },
+    }
 
     _public.browserEventsConfig = {
         get: function(propertyName, defaultValue) {
@@ -210,9 +243,3 @@ export default (function(root) {
 
     return _public;
 })(window);
-
-// Once the dispatcher has been initialised, we can work on binding the events to elements.
-// Here, we need to iron out the basics of the schema for elements.
-// Ensure that the binding stuff is split into functions as best as possible to ensure that we can call functions again when things change in the DOM.
-
-// Add in the metadata stuff.

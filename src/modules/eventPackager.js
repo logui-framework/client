@@ -28,10 +28,11 @@ export default (function(root) {
 
     _public.packageInteractionEvent = function() {
         Dispatcher.sendObject({hello: 'world'});
+        // metadata sourcer has to go here.
     };
 
-    _public.packageBrowserEvent = function(eventDetails) {
-        let packageObject = getBasicPackageObject();
+    _public.packageBrowserEvent = function(event, eventDetails) {
+        let packageObject = getBasicPackageObject(event);
 
         packageObject.eventType = 'browserEvent';
         packageObject.eventDetails = eventDetails;
@@ -48,13 +49,12 @@ export default (function(root) {
         Dispatcher.sendObject({hello: 'start'});
     };
 
-    var getBasicPackageObject = function() {
+    var getBasicPackageObject = function(event) {
         return {
             eventType: null,
             eventDetails: {},
-            clientTimestamps: {
-                fromPageLoad: 0,
-                absolute: 0,
+            timestamps: {
+                fromLoad: event.timeStamp,
             },
             applicationSpecificData: Config.getApplicationSpecificData(),
         }

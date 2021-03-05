@@ -15,6 +15,7 @@ import Helpers from '../helpers'
 import Defaults from '../defaults';
 import RequiredFeatures from '../required';
 import ValidationSchemas from '../validationSchemas';
+import config from '../config';
 
 Defaults.dispatcher = {
     consoleElement: null,  // The element that the console is rendered in.
@@ -34,7 +35,8 @@ export default (function(root) {
     _public.init = async function() {
         return new Promise(function(resolve) {
             let initState = (
-                doesConsoleElementExist()
+                doesConsoleElementExist() &&
+                getSessionDetails()
             );
 
             if (initState) {
@@ -72,7 +74,7 @@ export default (function(root) {
         }
 
         return true;
-    }
+    };
 
     function createElement(objToSend) {
         let newNode = document.createElement('li');
@@ -82,7 +84,24 @@ export default (function(root) {
         _consoleElement.insertBefore(newNode, _consoleElement.firstChild);
 
         return newNode;
-    }
+    };
+
+    function getSessionDetails() {
+        if (Config.sessionData.getSessionIDKey()) {
+            Config.sessionData.setIDFromSession();
+            Config.sessionData.setStartTimestamp(new Date()); // This date should come from the server when a recognised session ID is given.
+
+            //return false; // If the server disagrees with the key supplied, you'd return false here to fail the initialisation.
+        }
+        else {
+            // Create a new session.
+            // For the websocket dispatcher, we'd send off a blank session ID field, and it will return a new one.
+            Config.sessionData.setID('CONSOLE-SESSION-ID'); // ID should come from the server in the websocket dispatcher.
+            Config.sessionData.setStartTimestamp(new Date());
+        }
+
+        return true;
+    };
 
     return _public;
 })(window);
