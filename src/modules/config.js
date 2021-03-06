@@ -143,8 +143,22 @@ export default (function(root) {
         return _configProperties[propertyName];
     };
 
-    _public.getApplicationSpecificData = function() {
-        return _applicationSpecificData;
+    // _public.getApplicationSpecificData = function() {
+    //     return _applicationSpecificData;
+    // };
+
+    _public.applicationSpecificData = {
+        get: function() {
+            return _applicationSpecificData;
+        },
+
+        update: function(updatedObject) {
+            _applicationSpecificData = Helpers.extendObject(_applicationSpecificData, updatedObject);
+        },
+
+        deleteKey: function(keyName) {
+            delete _applicationSpecificData[keyName];
+        },
     };
 
     _public.elementTrackingConfig = {

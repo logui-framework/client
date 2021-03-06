@@ -31,7 +31,7 @@ export default (function(root) {
     _public.packageInteractionEvent = function(element, eventDetails, trackingConfig) {
         let packageObject = getBasicPackageObject();
 
-        packageObject.eventType = 'interaction';
+        packageObject.eventType = 'interactionEvent';
         packageObject.eventDetails = eventDetails;
         packageObject.metadata = MetadataHandler.getMetadata(element, trackingConfig);
 
@@ -53,29 +53,32 @@ export default (function(root) {
     };
 
     _public.packageStatusEvent = function(eventDetails) {
+        let packageObject = getBasicPackageObject();
 
+        packageObject.eventType = 'statusEvent';
+        packageObject.eventDetails = eventDetails;
+
+        console.log(packageObject);
+
+        // Dispatcher.sendObject(packageObject);
     };
 
-    var packageLogUIStartedEvent = function(eventDetails) {
-        let toSend = {
-            eventType: 'started',
-            eventDetails: {
-                type: 'started logui',
-            },
+    var packageLogUIStartedEvent = function() {
+        let eventDetails = {
+            type: 'started',
+            browserAgent: 'agentString',
+            resolution: '1920x1080x32',
         };
 
-        Dispatcher.sendObject(toSend);
+        _public.packageStatusEvent(eventDetails);
     };
 
     var packageLogUIStopEvent = function() {
-        let toSend = {
-            eventType: 'stopped',
-            eventDetails: {
-                type: 'stopped logui',
-            },
+        let eventDetails = {
+            type: 'stopped',
         };
 
-        Dispatcher.sendObject(toSend);
+        _public.packageStatusEvent(eventDetails);
     };
 
     var getBasicPackageObject = function() {
@@ -91,9 +94,12 @@ export default (function(root) {
                 sinceSessionStartMillis: currentTimestamp - sessionStartTimestamp,
                 sinceLogUILoadMillis: currentTimestamp - libraryStartTimestamp,
             },
-            applicationSpecificData: Config.getApplicationSpecificData(),
+            applicationSpecificData: Config.applicationSpecificData.get(),
         }
     }
 
     return _public;
 })(window);
+
+// Next: tidy up the events to be sent to the dispatcher.
+// Implement the dispatcher!

@@ -73,9 +73,17 @@ export default (function(root) {
 
     };
 
-    _public.updateApplicationSpecificData = function(appSpecificObject) {
+    _public.updateApplicationSpecificData = function(updatedObject) {
+        if (!_public.isActive()) {
+            throw Error('Application specific data can only be updated when the LogUI client is active.');
+        }
 
+        Config.applicationSpecificData.update(updatedObject);
     };
+
+    _public.deleteApplicationSpecificDataKey = function(key) {
+        Config.applicationSpecificData.deleteKey(key);
+    }
 
     _public.clearSessionID = function() {
         if (_public.isActive()) {
