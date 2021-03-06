@@ -119,7 +119,7 @@ export default (function(root) {
     var pageEnterCallback = function(event) {
         let returnObject = getBasicTrackingObject(event, _hadFocus);
         returnObject.type = 'cursorTracking';
-        returnObject.trackingState = 'cursorEnteredViewport';
+        returnObject.trackingType = 'cursorEnteredViewport';
 
         intervalTimerSet();
         EventPackager.packageBrowserEvent(returnObject);

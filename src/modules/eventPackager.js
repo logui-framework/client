@@ -11,8 +11,8 @@
 */
 
 import Config from './config';
-import Dispatcher from '__dispatcherImportInPackager__';
 import MetadataHandler from './metadataHandler';
+import Dispatcher from '__dispatcherImportInPackager__';
 
 export default (function(root) {
     var _public = {};
@@ -33,7 +33,7 @@ export default (function(root) {
         Dispatcher.sendObject(packageObject);
     };
 
-    _public.packageBrowserEvent = function(eventDetails, trackingConfig) {
+    _public.packageBrowserEvent = function(eventDetails) {
         let packageObject = getBasicPackageObject();
 
         packageObject.eventType = 'browserEvent';

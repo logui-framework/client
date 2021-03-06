@@ -80,11 +80,52 @@ export default (function(root) {
 
         newNode.appendChild(document.createTextNode(objToSend.eventType));
         newNode.appendChild(document.createElement('br'));
-        newNode.appendChild(document.createTextNode(objToSend.eventDetails.type));
+        newNode.appendChild(document.createTextNode(getEventDetails(objToSend)));
         _consoleElement.insertBefore(newNode, _consoleElement.firstChild);
 
         return newNode;
     };
+
+    function getEventDetails(objToSend) {
+        switch (objToSend.eventType) {
+            case 'interactionEvent':
+                return objToSend.eventDetails.type;
+            case 'browserEvent':
+                switch (objToSend.eventDetails.type) {
+                    case 'contextMenuFired':
+                        return 'Context menu requested';
+                    case 'cursorTracking':
+                        switch (objToSend.eventDetails.trackingType) {
+                            case 'positionUpdate':
+                                return `Cursor at ${objToSend.eventDetails.clientX},${objToSend.eventDetails.clientY} in viewport`;
+                            case 'cursorLeftViewport':
+                                return `Cursor left viewport at ${objToSend.eventDetails.clientX},${objToSend.eventDetails.clientY}`;
+                            case 'cursorEnteredViewport':
+                                return `Cursor entered viewport at ${objToSend.eventDetails.clientX},${objToSend.eventDetails.clientY}`;
+                        };
+                    case 'viewportFocusChange':
+                        if (objToSend.eventDetails.hasFocus) {
+                            return 'Viewport is now the active window';
+                        }
+                        else {
+                            return 'Viewport focus has been lost';
+                        }
+                    case 'URLChange':
+                        return `URL changed in browser to ${objToSend.eventDetails.newURL}`;
+                    case 'viewportResize':
+                        return `Viewport resized to ${objToSend.eventDetails.viewportWidth}x${objToSend.eventDetails.viewportHeight}`;
+                }
+            case 'statusEvent':
+                switch (objToSend.eventDetails.type) {
+                    case 'started':
+                        return 'LogUI Started';
+                    case 'stopped':
+                        return 'LogUI Stopped';
+                    case 'applicationSpecificDataUpdated':
+                        return 'Application specific data was updated';
+                }
+        }
+    }
 
     function getSessionDetails() {
         let currentTimestamp = new Date();
