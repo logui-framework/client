@@ -18,15 +18,10 @@ export default (function(root) {
     var _public = {};
 
     _public.init = function() {
-        root.addEventListener('logUIStarted', packageLogUIStartedEvent);
-
         return true;
     };
 
-    _public.stop = function() {
-        root.removeEventListener('logUIStarted', packageLogUIStartedEvent);
-        packageLogUIStopEvent();
-    };
+    _public.stop = function() { };
 
     _public.packageInteractionEvent = function(element, eventDetails, trackingConfig) {
         let packageObject = getBasicPackageObject();
@@ -35,10 +30,7 @@ export default (function(root) {
         packageObject.eventDetails = eventDetails;
         packageObject.metadata = MetadataHandler.getMetadata(element, trackingConfig);
 
-        console.log(packageObject);
-
-        //Dispatcher.sendObject(toSend);
-        // metadata sourcer has to go here.
+        Dispatcher.sendObject(packageObject);
     };
 
     _public.packageBrowserEvent = function(eventDetails, trackingConfig) {
@@ -47,9 +39,7 @@ export default (function(root) {
         packageObject.eventType = 'browserEvent';
         packageObject.eventDetails = eventDetails;
 
-        console.log(eventDetails);
-
-        //Dispatcher.sendObject(packageObject);
+        Dispatcher.sendObject(packageObject);
     };
 
     _public.packageStatusEvent = function(eventDetails) {
@@ -58,27 +48,7 @@ export default (function(root) {
         packageObject.eventType = 'statusEvent';
         packageObject.eventDetails = eventDetails;
 
-        console.log(packageObject);
-
-        // Dispatcher.sendObject(packageObject);
-    };
-
-    var packageLogUIStartedEvent = function() {
-        let eventDetails = {
-            type: 'started',
-            browserAgent: 'agentString',
-            resolution: '1920x1080x32',
-        };
-
-        _public.packageStatusEvent(eventDetails);
-    };
-
-    var packageLogUIStopEvent = function() {
-        let eventDetails = {
-            type: 'stopped',
-        };
-
-        _public.packageStatusEvent(eventDetails);
+        Dispatcher.sendObject(packageObject);
     };
 
     var getBasicPackageObject = function() {
@@ -100,6 +70,3 @@ export default (function(root) {
 
     return _public;
 })(window);
-
-// Next: tidy up the events to be sent to the dispatcher.
-// Implement the dispatcher!

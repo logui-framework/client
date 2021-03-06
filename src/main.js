@@ -1,9 +1,9 @@
 import Config from './modules/config';
+import Dispatcher from '__dispatcherImport__';
 import DOMHandler from './modules/DOMHandler/handler';
 import EventPackager from './modules/eventPackager';
-import Helpers from './modules/helpers';
-import Dispatcher from '__dispatcherImport__';
 import MetadataHandler from './modules/metadataHandler';
+import SpecificFrameworkEvents from './modules/specificFrameworkEvents';
 import EventHandlerController from './modules/eventHandlerController';
 
 export default (function(root) {
@@ -34,6 +34,10 @@ export default (function(root) {
             throw Error('The LogUI event packaging component failed to initialise. Check console warnings to see what went wrong.');
         }
 
+        if (!SpecificFrameworkEvents.init()) {
+            throw Error('The LogUI events component failed to initialise. Check console warnings to see what went wrong.');
+        }
+
         if (!await Dispatcher.init(suppliedConfigObject)) {
             throw Error('The LogUI dispatcher component failed to initialise. Check console warnings to see what went wrong.');
         }
@@ -62,6 +66,7 @@ export default (function(root) {
         // https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
         DOMHandler.stop();
         EventHandlerController.stop();
+        SpecificFrameworkEvents.stop();
         EventPackager.stop();
         MetadataHandler.stop();
         await Dispatcher.stop();
@@ -79,10 +84,12 @@ export default (function(root) {
         }
 
         Config.applicationSpecificData.update(updatedObject);
+        SpecificFrameworkEvents.logUIUpdatedApplicationSpecificData();
     };
 
     _public.deleteApplicationSpecificDataKey = function(key) {
         Config.applicationSpecificData.deleteKey(key);
+        SpecificFrameworkEvents.logUIUpdatedApplicationSpecificData();
     }
 
     _public.clearSessionID = function() {
