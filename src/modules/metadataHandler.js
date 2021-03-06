@@ -56,7 +56,6 @@ export default (function(root) {
                 let objectToPush = selectedSourcer.getObject(element, entry);
 
                 if (objectToPush) {
-                    console.log(objectToPush);
                     returnArray.push(objectToPush);
                     observedNames.push(entry.nameForLog);
                 }

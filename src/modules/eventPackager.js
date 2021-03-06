@@ -33,8 +33,9 @@ export default (function(root) {
 
         packageObject.eventType = 'interaction';
         packageObject.eventDetails = eventDetails;
+        packageObject.metadata = MetadataHandler.getMetadata(element, trackingConfig);
 
-        MetadataHandler.getMetadata(element, trackingConfig);
+        console.log(packageObject);
 
         //Dispatcher.sendObject(toSend);
         // metadata sourcer has to go here.
