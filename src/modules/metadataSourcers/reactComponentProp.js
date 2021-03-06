@@ -1,10 +1,10 @@
 /*
     LogUI Client Library
-    Metadata Sourcers / SessionStorage Sourcer
+    Metadata Sourcers / React Component Prop Sourcer
 
-    An IIFE function yielding a module for extracting data from the SessionStorage object.
+    An IIFE function yielding a module for extracting prop data from a React component.
 
-    @module: SessionStorage Sourcer Module
+    @module: React Component Prop Sourcer Module
     @author: David Maxwell
     @date: 2021-03-05
 */
@@ -31,15 +31,21 @@ export default (function(root) {
         }
 
         return undefined;
-    }
+    };
 
     _sourcer.getValue = function(element, request) {
-        if (request.hasOwnProperty('lookFor')) {
-            return sessionStorage.getItem(request.lookFor);
+        for (let key in element) {
+            if (key.startsWith('__reactFiber')) {
+                let propsObject = element[key]._debugOwner.stateNode.props;
+                
+                if (propsObject.hasOwnProperty(request.lookFor)) {
+                    return propsObject[request.lookFor];
+                }
+            }
         }
 
         return undefined;
-    }
+    };
 
     return _sourcer;
 })(window);

@@ -5,46 +5,78 @@
     An IIFE function returning the handler for metadata for LogUI.
     Gathers data from various sources in preparation for sending to the dispatcher.
 
-    @module: MetadataHandler
+    @module: Metadata Handler Module
     @author: David Maxwell
-    @date: 2020-10-05
+    @date: 2021-03-05
 */
 
+import Sourcers from './metadataSourcers/*';
 
 export default (function(root) {
     var _public = {};
 
-    _public.get = function(property) {
-        // property should contain an object -- source and name, along with other data.
-        // map source to a private function in this module.
-
-        // _mapRequestToSource(property)
+    _public.init = function() {
+        for (let sourcer in Sourcers) {
+            Sourcers[sourcer].init();
+        }
 
         return true;
     };
 
-    var _mapRequestToSource = function(property) {
-        return true;
-    };
+    _public.stop = function() {
+        for (let sourcerName in Sourcers) {
+            let sourcer = Sourcers[sourcerName];
 
-    var _elementAttribute = {
-        get = function(element, name) {
-            return true;
-            // get the attribute value and return it.
+            if (sourcer.hasOwnProperty('stop')) {
+                sourcer.stop();
+            }
         }
     };
 
-    var _nodeJSState = {
+    _public.getMetadata = function(element, trackingConfig) {
+        let returnArray = [];
+        let observedNames = [];
 
+        if (trackingConfig.hasOwnProperty('metadata')) {
+            for (let entry of trackingConfig.metadata) {
+                let selectedSourcer = getSourcer(entry.sourcer);
+
+                if (!selectedSourcer) {
+                    continue;
+                }
+
+                if (!entry.hasOwnProperty('nameForLog') || !entry.hasOwnProperty('lookFor')) {
+                    continue;
+                }
+
+                if (observedNames.includes(entry.nameForLog)) {
+                    continue;
+                }
+
+                let objectToPush = selectedSourcer.getObject(element, entry);
+
+                if (objectToPush) {
+                    console.log(objectToPush);
+                    returnArray.push(objectToPush);
+                    observedNames.push(entry.nameForLog);
+                }
+            }
+        }
+
+        return returnArray;
     };
 
-    var _sessionStorage = {
+    var getSourcer = function(requestedSourcerName) {
+        for (let sourcerName in Sourcers) {
+            if (sourcerName == requestedSourcerName) {
+                return Sourcers[sourcerName];
+            }
+        }
 
-    };
-
-    var _localStorage = {
-
+        return undefined;
     };
 
     return _public;
 })(window);
+
+// Build a very simple react app (clock or something with a button)

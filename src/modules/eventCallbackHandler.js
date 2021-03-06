@@ -37,21 +37,21 @@ export default (function(root) {
         }
 
         if (packageEvent) {
-            EventPackager.packageInteractionEvent(packageEvent, trackingConfig);
+            EventPackager.packageInteractionEvent(this, packageEvent, trackingConfig);
         }
     };
 
     var _defaultEventCallbackHandler = function(eventContext, browserEvent, trackingConfig) {
-        EventPackager.packageInteractionEvent({}, trackingConfig);
+        let returnObject = {
+            type: browserEvent.type,
+        };
+
+        if (trackingConfig.hasOwnProperty('name')) {
+            returnObject.name = trackingConfig.name;
+        }
+
+        return returnObject;
     };
 
     return _public;
 })(window);
-
-
-// After dinner, start thinking about the window-based events. resize, blur, etc.
-// Can we adjust the config object to make this in their own bit?
-// Do they need their own listener?
-
-// in the packager, get the properties from the trackingConfig.
-// implement basic metadata sourcing.

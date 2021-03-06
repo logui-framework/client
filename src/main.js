@@ -3,6 +3,7 @@ import DOMHandler from './modules/DOMHandler/handler';
 import EventPackager from './modules/eventPackager';
 import Helpers from './modules/helpers';
 import Dispatcher from '__dispatcherImport__';
+import MetadataHandler from './modules/metadataHandler';
 import EventHandlerController from './modules/eventHandlerController';
 
 export default (function(root) {
@@ -23,6 +24,10 @@ export default (function(root) {
 
         if (!Config.init(suppliedConfigObject)) {
             throw Error('The LogUI configuration component failed to initialise. Check console warnings to see what went wrong.');
+        }
+
+        if (!MetadataHandler.init()) {
+            throw Error('The LogUI metadata handler component failed to initialise. Check console warnings to see what went wrong.');
         }
 
         if (!EventPackager.init()) {
@@ -58,6 +63,7 @@ export default (function(root) {
         DOMHandler.stop();
         EventHandlerController.stop();
         EventPackager.stop();
+        MetadataHandler.stop();
         await Dispatcher.stop();
         Config.reset();
         root.dispatchEvent(new Event('logUIStopped'));

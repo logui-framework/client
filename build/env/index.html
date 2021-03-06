@@ -36,7 +36,7 @@
                 <div id="container-test-click" class="group-container">
                     <h2>Basic Hover/Click Events</h2>
                     <div>
-                        <div class="test" id="test-click-box1">Hover!</div>
+                        <div class="test" id="test-click-box1" data-test-attribute="from the attribute!">Hover!</div>
                         <div class="test" id="test-click-box2">
                             <div class="test" id="test-click-box3">Nested</div>
                         </div>
@@ -47,6 +47,13 @@
                     <div>
                         <button id="test-dommanipulation-button">Click to add two new elements</button>
                         <div id="test-dommanipulation-newcontainer"></div>
+                    </div>
+                </div>
+                <div id="container-test-dommanipulation" class="group-container">
+                    <h2>Basic React Application</h2>
+                    <div>
+                        The app is below the horizontal rule.
+                        <div id="test-reactapp-container"></div>
                     </div>
                 </div>
             </div>
@@ -60,6 +67,7 @@
 
     <script src="controller.js"></script>
     <script src="../logui.bundle.js"></script>
+    <script src="../reactapp.bundle.js"></script>
     <script>
 
         // LogUI.EventHandlers.somePluginAdded = (function(event) {
@@ -131,7 +139,42 @@
                     selector: '#test-click-box1',
                     event: 'mouseover',
                     name: 'SOME_BLAH_HOVERIN',
+                    metadata: [
+                        {
+                            nameForLog: 'LOG_AS_NAME',
+                            sourcer: 'elementAttribute',
+                            lookFor: 'data-test-attribute',
+                        },
+                        {
+                            nameForLog: 'SOME_LOCAL_NAME',
+                            sourcer: 'localStorage',
+                            lookFor: 'testVarInLocal',
+                        },
+                        {
+                            nameForLog: 'A_NEW_NAME',
+                            sourcer: 'sessionStorage',
+                            lookFor: 'sess',
+                        }
+                    ],
                 },
+
+                'clockHover': {
+                    selector: '#test-reactapp-clock',
+                    event: 'mouseover',
+                    name: 'CLOCK_HOVER_TIME',
+                    metadata: [
+                        {
+                            nameForLog: 'CURRENT_TIME',
+                            sourcer: 'reactComponentState',
+                            lookFor: 'time',
+                        },
+                        {
+                            nameForLog: 'PROP_TEST',
+                            sourcer: 'reactComponentProp',
+                            lookFor: 'sampleProp',
+                        }
+                    ],
+                }
 
 
                 // 'something': {

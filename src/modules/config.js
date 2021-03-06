@@ -157,13 +157,13 @@ export default (function(root) {
         },
     };
 
-    // _public.getInitTimestamp = function() {
-    //     return _initTimestamp;
-    // };
-
     _public.isActive = function() {
         return (!!_initTimestamp);
     };
+
+    _public.getInitTimestamp = function() {
+        return _initTimestamp;
+    }
 
     _public.sessionData = {
         init: function() {

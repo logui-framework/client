@@ -175,3 +175,14 @@ div#test-dommanipulation-box2 {
     float: right;
     background-color: seagreen;
 }
+
+div#test-reactapp-clock {
+    text-align: center;
+    font-family: monospace;
+    font-size: 32pt;
+    font-weight: bold;
+    background-color: #666;
+    color: #FFF;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}

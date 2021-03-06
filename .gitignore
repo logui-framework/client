@@ -15,6 +15,7 @@ node_modules/
 !.vscode/extensions.json
 
 # Repository-specific rules
-build/logui.bundle.js
+build/*.bundle.js
+build/
 tests/screenshots
 tests/logui.test.bundle.js

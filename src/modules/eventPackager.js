@@ -12,6 +12,7 @@
 
 import Config from './config';
 import Dispatcher from '__dispatcherImportInPackager__';
+import MetadataHandler from './metadataHandler';
 
 export default (function(root) {
     var _public = {};
@@ -27,15 +28,13 @@ export default (function(root) {
         packageLogUIStopEvent();
     };
 
-    _public.packageInteractionEvent = function(eventDetails, trackingConfig) {
-        // let toSend = {
-        //     eventType: 'interaction',
-        //     eventDetails: {
-        //         type: 'some event',
-        //     },
-        // };
+    _public.packageInteractionEvent = function(element, eventDetails, trackingConfig) {
+        let packageObject = getBasicPackageObject();
 
-        console.log(eventDetails);
+        packageObject.eventType = 'interaction';
+        packageObject.eventDetails = eventDetails;
+
+        MetadataHandler.getMetadata(element, trackingConfig);
 
         //Dispatcher.sendObject(toSend);
         // metadata sourcer has to go here.
@@ -97,7 +96,3 @@ export default (function(root) {
 
     return _public;
 })(window);
-
-// Now it is case of wrapping stuff up properly. We have timestamps.
-// Metadata sourcers
-// Dispatcher for websocket.
