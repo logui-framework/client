@@ -107,9 +107,5 @@ export default (function(root) {
         Config.sessionData.clearSessionIDKey();
     };
 
-    _public.fireEvent = function(obj) {
-        Dispatcher.testFire(obj);
-    }
-
     return _public;
 })(window);

@@ -6,7 +6,7 @@
 
     @module: WebSocket-based Dispatcher
     @author: David Maxwell
-    @date: 2020-09-16
+    @date: 2021-03-08
 */
 
 import Config from '../config';
@@ -18,7 +18,7 @@ import ValidationSchemas from '../validationSchemas';
 Defaults.dispatcher = {
     endpoint: null,  // The URL of the WebSocket endpoint to send data to.
     authenticationToken: null,  // The string representing the authentication token to connect to the endpoint with.
-    queueSize: 100,  // The maximum number of items in the queue before flushing.
+    cacheSize: 100,  // The maximum number of stored events that can be in the cache before flushing.
     reconnectAttempts: 5,  // The maximum number of times we should try to reconnect.
     reconnectAttemptDelay: 5000  // The delay (in ms) we should wait between reconnect attempts.
 };
@@ -35,6 +35,7 @@ export default (function(root) {
     var _websocketReconnectionAttempts = 0;  // The total number of attempts that have been made to reconnect when the connection drops.
     var _websocketSuccessfulReconnections = 0;  // The total number of times there has been a successful (re)connection.
     var _websocketReconnectionReference = null;  // A reference to the reconnection routine when attempting to reconnect.
+    var _libraryLoadTimestamp = null;  // The time at which the dispatcher loads -- for measuring the beginning of a session more accurately.
 
     var _cache = null;
 
@@ -43,7 +44,15 @@ export default (function(root) {
     _public.init = function() {
         Config.getConfigProperty('endpoint');
 
-        initWebsocket();
+        // We may restart the dispatcher in the same context.
+        // There may still be a timer active from the previous iteration.
+        // If so, we cancel it.
+        if (_websocketReconnectionReference) {
+            clearInterval(_websocketReconnectionReference);
+            _websocketReconnectionReference = null;
+        }
+
+        _initWebsocket();
 
         _cache = [];
         _isActive = true;
@@ -51,11 +60,12 @@ export default (function(root) {
     };
 
     _public.stop = async function() {
-        tidyWebsocket();
+        _flushCache();
+        _tidyWebsocket();
 
         _websocketReconnectionAttempts = 0;
         _websocketSuccessfulReconnections = 0;
-        _websocketReconnectionReference = null;
+        _libraryLoadTimestamp = null;
 
         _cache = null;
         _isActive = false;
@@ -69,8 +79,9 @@ export default (function(root) {
         if (_isActive) {
             _cache.push(objectToSend);
 
-            if (_cache.length == 100) {
-
+            if (_cache.length >= Defaults.dispatcher.cacheSize) {
+                Helpers.console(`The event cache needs to be flushed and sent to the server.`, 'Dispatcher', true);
+                _flushCache();
             }
 
             return;
@@ -79,73 +90,82 @@ export default (function(root) {
         throw Error('You cannot send a message when LogUI is not active.');
     };
 
-    var initWebsocket = function() {
+    var _initWebsocket = function() {
         _websocket = new WebSocket(Config.getConfigProperty('endpoint'));
 
-        _websocket.addEventListener('close', callbacks.onClose);
-        _websocket.addEventListener('error', callbacks.onError);
-        _websocket.addEventListener('message', callbacks.onMessage);
-        _websocket.addEventListener('open', callbacks.onOpen);
+        _websocket.addEventListener('close', _callbacks.onClose);
+        _websocket.addEventListener('error', _callbacks.onError);
+        _websocket.addEventListener('message', _callbacks.onMessage);
+        _websocket.addEventListener('open', _callbacks.onOpen);
     };
 
-    var tidyWebsocket = function() {
+    var _tidyWebsocket = function() {
         if (_websocket) {
             Helpers.console(`The connection to the server is being closed.`, 'Dispatcher', true);
 
-            _websocket.removeEventListener('close', callbacks.onClose);
-            _websocket.removeEventListener('error', callbacks.onError);
-            _websocket.removeEventListener('message', callbacks.onMessage);
-            _websocket.removeEventListener('open', callbacks.onOpen);
+            _websocket.removeEventListener('close', _callbacks.onClose);
+            _websocket.removeEventListener('error', _callbacks.onError);
+            _websocket.removeEventListener('message', _callbacks.onMessage);
+            _websocket.removeEventListener('open', _callbacks.onOpen);
     
             _websocket.close();
             _websocket = null;
         }
     };
 
-    var attemptReconnect = function() {
+    var _attemptReconnect = function() {
         if (_websocket && !_websocketReconnectionReference) {
-            tidyWebsocket();
+            _tidyWebsocket();
 
             _websocketReconnectionReference = setInterval(() => {
-                if (_websocket) {
-                    switch (_websocket.readyState) {
-                        case 0:
-                            return;
-                        case 1:
-                            Helpers.console(`The connection to the server has been (re-)established.`, 'Dispatcher', true);
+                if (_isActive) {
+                    if (_websocket) {
+                        switch (_websocket.readyState) {
+                            case 0:
+                                return;
+                            case 1:
+                                Helpers.console(`The connection to the server has been (re-)established.`, 'Dispatcher', true);
 
-                            clearInterval(_websocketReconnectionReference);
-                            _websocketReconnectionAttempts = 0;
-                            _websocketReconnectionReference = null;
+                                clearInterval(_websocketReconnectionReference);
+                                _websocketReconnectionAttempts = 0;
+                                _websocketReconnectionReference = null;
 
-                            return;
-                        default:
-                            Helpers.console(`The connection to the server has failed; we are unable to restart.`, 'Dispatcher', true);
-                            tidyWebsocket();
-                            return;
+                                return;
+                            default:
+                                Helpers.console(`The connection to the server has failed; we are unable to restart.`, 'Dispatcher', true);
+                                _tidyWebsocket();
+                                return;
+                        }
                     }
+
+                    // Counter incremented here to consider the first attempt.
+                    _websocketReconnectionAttempts += 1;
+
+                    if (_websocketReconnectionAttempts == Defaults.dispatcher.reconnectAttempts) {
+                        Helpers.console(`We've maxed out the number of permissible reconnection attempts. We must stop here.`, 'Dispatcher', true);
+
+                        clearInterval(_websocketReconnectionReference);
+                        root.dispatchEvent(new Event('logUIShutdownRequest'));
+                        throw Error('LogUI attempted to reconnect to the server but failed to do so. LogUI is now stopping. Any events not sent to the server will be lost.');
+
+                    }
+                    
+                    Helpers.console(`(Re-)connection attempt ${_websocketReconnectionAttempts} of ${Defaults.dispatcher.reconnectAttempts}`, 'Dispatcher', true);
+                    _initWebsocket();
                 }
-
-                // Counter incremented here to consider the first attempt.
-                _websocketReconnectionAttempts += 1;
-
-                if (_websocketReconnectionAttempts == Defaults.dispatcher.reconnectAttempts) {
-                    Helpers.console(`We've maxed out the number of permissible reconnection attempts. We must stop here.`, 'Dispatcher', true);
-
+                else {
+                    // Here, the instance of LogUI has already been stopped.
+                    // So just silently clear the timer -- and reset the referene back to null.
                     clearInterval(_websocketReconnectionReference);
-                    root.dispatchEvent(new Event('logUIShutdownRequest'));
-                    throw Error('LogUI attempted to reconnect to the server but failed to do so. LogUI is now stopping. Any events not sent to the server will be lost.');
+                    _websocketReconnectionReference = null;
 
                 }
-                
-                Helpers.console(`(Re-)connection attempt ${_websocketReconnectionAttempts} of ${Defaults.dispatcher.reconnectAttempts}`, 'Dispatcher', true);
-                initWebsocket();
             }, Defaults.dispatcher.reconnectAttemptDelay);
         }
 
     };
 
-    var callbacks = {
+    var _callbacks = {
         onClose: function(event) {
             Helpers.console(`The connection to the server has been closed.`, 'Dispatcher', true);
 
@@ -181,8 +201,7 @@ export default (function(root) {
                     console.log('clean connection closure!');
                     break;
                 case 1006:
-                    console.log('disconnection. try again to reconnect.');
-                    attemptReconnect();
+                    _attemptReconnect();
                     break;
                 default:
                     root.dispatchEvent(new Event('logUIShutdownRequest'));
@@ -190,9 +209,7 @@ export default (function(root) {
             }
         },
 
-        onError: function(event) {
-            console.log('error');
-        },
+        onError: function(event) { },
 
         onMessage: function(receivedMessage) {
             let messageObject = JSON.parse(receivedMessage.data);
@@ -201,8 +218,18 @@ export default (function(root) {
                 case 'handshakeSuccess':
                     Helpers.console(`The handshake was successful. Hurray! The server is listening.`, 'Dispatcher', true);
                     Config.sessionData.setID(messageObject.payload.sessionID);
-                    console.log(messageObject.payload.clientStartTimetamp);
-                    console.log(new Date(messageObject.payload.clientStartTimetamp));
+
+                    if (messageObject.payload.newSessionCreated) {
+                        Config.sessionData.setTimestamps(new Date(messageObject.payload.clientStartTimestamp), new Date(messageObject.payload.clientStartTimestamp));
+                    }
+                    else {
+                        Config.sessionData.setTimestamps(new Date(messageObject.payload.clientStartTimestamp), new Date());
+                        
+                        if (_cache.length >= Defaults.dispatcher.cacheSize) {
+                            console.log('flush the cache');
+                        }
+                    }
+
                     break;
             }
         },
@@ -218,6 +245,7 @@ export default (function(root) {
                 authenticationToken: Config.getConfigProperty('authenticationToken'),
                 pageOrigin: root.location.origin,
                 userAgent: root.navigator.userAgent,
+                clientTimestamp: new Date(),
             };
 
             if (sessionID) {
@@ -225,12 +253,12 @@ export default (function(root) {
             }
 
             Helpers.console(`The LogUI handshake has been sent.`, 'Dispatcher', true);
-            _websocket.send(JSON.stringify(getMessageObject('handshake', payload)));
+            _websocket.send(JSON.stringify(_getMessageObject('handshake', payload)));
         },
 
     };
 
-    var getMessageObject = function(messageType, payload) {
+    var _getMessageObject = function(messageType, payload) {
         return {
             sender: 'logUIClient',
             type: messageType,
@@ -238,34 +266,17 @@ export default (function(root) {
         };
     };
 
-    var flushCache = function() {
+    var _flushCache = function() {
+        let payload = {
+            length: _cache.length,
+            items: _cache,
+        };
 
+        _websocket.send(JSON.stringify(_getMessageObject('logEvents', payload)));
+        Helpers.console(`Cache flushed.`, 'Dispatcher', true);
+
+        _cache = [];
     };
-
-    // var getSessionDetails = function() {
-    //     let currentTimestamp = new Date();
-
-    //     if (Config.sessionData.getSessionIDKey()) {
-    //         Config.sessionData.setIDFromSession();
-    //         Config.sessionData.setTimestamps(currentTimestamp, currentTimestamp); // The first date should come from the server (for the session start time).
-
-    //         //return false; // If the server disagrees with the key supplied, you'd return false here to fail the initialisation.
-    //     }
-    //     else {
-    //         // Create a new session.
-    //         // For the websocket dispatcher, we'd send off a blank session ID field, and it will return a new one.
-    //         Config.sessionData.setID('CONSOLE-SESSION-ID'); // ID should come from the server in the websocket dispatcher.
-    //         Config.sessionData.setTimestamps(currentTimestamp, currentTimestamp);
-    //     }
-
-    //     return true;
-    // };
-
-    _public.testFire = function(obj) {
-        _websocket.send(JSON.stringify(obj));
-    }
-
-
     
     return _public;
 })(window);
