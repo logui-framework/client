@@ -41,7 +41,8 @@ export default (function(root) {
             if (initState) {
                 _isActive = true;
             };
-
+            
+            root.dispatchEvent(new Event('logUIStarted'));
             resolve(initState);
         });
     };

@@ -59,6 +59,7 @@ export default (function(root) {
         return {
             eventType: null,
             eventDetails: {},
+            sessionID: Config.sessionData.getSessionIDKey(),
             timestamps: {
                 eventTimestamp: currentTimestamp,
                 sinceSessionStartMillis: currentTimestamp - sessionStartTimestamp,

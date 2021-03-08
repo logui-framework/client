@@ -52,7 +52,6 @@ export default (function(root) {
             throw Error('The LogUI event handler controller component failed to initialise. Check console warnings to see what went wrong.');
         }
         
-        root.dispatchEvent(new Event('logUIStarted'));
         root.addEventListener('unload', _public.stop);
     };
 

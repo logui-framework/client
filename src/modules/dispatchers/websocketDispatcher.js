@@ -230,10 +230,12 @@ export default (function(root) {
                         Config.sessionData.setTimestamps(new Date(messageObject.payload.clientStartTimestamp), new Date());
                         
                         if (_cache.length >= Defaults.dispatcher.cacheSize) {
-                            console.log('flush the cache');
+                            _flushCache();
                         }
                     }
 
+                    // ADD CALL HERE
+                    root.dispatchEvent(new Event('logUIStarted'));
                     break;
             }
         },

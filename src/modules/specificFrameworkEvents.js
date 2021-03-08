@@ -17,7 +17,6 @@ export default (function(root) {
 
     _public.init = function() {
         root.addEventListener('logUIStarted', _public.logUIStartedEvent);
-
         return true;
     };
 
