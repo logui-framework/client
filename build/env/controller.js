@@ -78,6 +78,9 @@ var LogUITestEnvDriver = (function(root) {
         // We could equally put this code in the .stop().then() call above.
         root.addEventListener('logUIStopped', function() {
             _public.addEnvMessage('LogUI stopped');
+
+            _public.$('#control-start').disabled = false;
+            _public.$('#control-stop').disabled = true;
         });
     };
 

@@ -18,6 +18,8 @@ export default (function(root) {
 
     /* API calls */
     _public.init = async function(suppliedConfigObject) {
+        root.addEventListener('logUIShutdownRequest', _public.stop);
+
         if (!suppliedConfigObject) {
             throw Error('LogUI requires a configuration object to be passed to the init() function.');
         }
@@ -61,7 +63,12 @@ export default (function(root) {
     }
 
     _public.stop = async function() {
+        if (!_public.isActive()) {
+            throw Error('LogUI may only be stopped if it is currently running.');
+        }
+
         root.removeEventListener('unload', _public.stop);
+        root.removeEventListener('logUIShutdownRequest', _public.stop);
 
         // https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
         DOMHandler.stop();
@@ -99,6 +106,10 @@ export default (function(root) {
 
         Config.sessionData.clearSessionIDKey();
     };
+
+    _public.fireEvent = function(obj) {
+        Dispatcher.testFire(obj);
+    }
 
     return _public;
 })(window);

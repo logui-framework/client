@@ -27,9 +27,9 @@ ValidationSchemas.addLogUIConfigProperty('consoleElement', 'string');
 
 export default (function(root) {
     var _public = {};
-    _public.dispatcherType = 'console';
     var _isActive = false;
     var _consoleElement = null;
+    _public.dispatcherType = 'console';
 
     _public.init = async function() {
         return new Promise(function(resolve) {

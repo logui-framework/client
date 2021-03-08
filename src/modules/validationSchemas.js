@@ -33,13 +33,9 @@ const SCHEMA_SUPPLIED_CONFIG_LOGUI = {
     type: 'object',
     properties: {
         verbose: {'type': 'boolean'},
-        sessionUUID: {'type': ['string', 'null']},
         browserEvents : {'$ref': '/LogUI-browserEvents'},
     },
-    required: [
-        'verbose',
-        'sessionUUID',
-    ]
+    required: [],
 }
 
 const SCHEMA_SUPPLIED_CONFIG_LOGUI_BROWSEREVENTS = {
