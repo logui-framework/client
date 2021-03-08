@@ -18,7 +18,8 @@ import ValidationSchemas from '../validationSchemas';
 Defaults.dispatcher = {
     endpoint: null,  // The URL of the WebSocket endpoint to send data to.
     authenticationToken: null,  // The string representing the authentication token to connect to the endpoint with.
-    cacheSize: 100,  // The maximum number of stored events that can be in the cache before flushing.
+    cacheSize: 10,  // The maximum number of stored events that can be in the cache before flushing.
+    maximumCacheSize: 1000,  // When no connection is present, this is the cache size we shut down LogUI at.
     reconnectAttempts: 5,  // The maximum number of times we should try to reconnect.
     reconnectAttemptDelay: 5000  // The delay (in ms) we should wait between reconnect attempts.
 };
@@ -67,6 +68,10 @@ export default (function(root) {
         _websocketSuccessfulReconnections = 0;
         _libraryLoadTimestamp = null;
 
+        if (_websocketReconnectionReference) {
+            clearInterval(_websocketReconnectionReference);
+        }
+
         _cache = null;
         _isActive = false;
     };
@@ -80,7 +85,6 @@ export default (function(root) {
             _cache.push(objectToSend);
 
             if (_cache.length >= Defaults.dispatcher.cacheSize) {
-                Helpers.console(`The event cache needs to be flushed and sent to the server.`, 'Dispatcher', true);
                 _flushCache();
             }
 
@@ -267,6 +271,15 @@ export default (function(root) {
     };
 
     var _flushCache = function() {
+        if (!_websocket || _websocket.readyState != 1) {
+            if (_cache.length >= Defaults.dispatcher.maximumCacheSize) {
+                Helpers.console(`The cache has grown too large, with no connection to clear it. LogUI will now stop; any cached events will be lost.`, 'Dispatcher', true);
+                root.dispatchEvent(new Event('logUIShutdownRequest'));
+            }
+
+            return;
+        }
+
         let payload = {
             length: _cache.length,
             items: _cache,
