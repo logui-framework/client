@@ -195,6 +195,9 @@ export default (function(root) {
                     errorMessage = 'The LogUI client sent an invalid session ID to the server. LogUI is shutting down.';
                     Config.sessionData.clearSessionIDKey();
                     break;
+                case 4007:
+                    errorMessage = 'The LogUI server is not accepting new connections for this application at present.';
+                    break;
                 default:
                     errorMessage = `${errorMessage} The recorded error code was ${event.code}. LogUI is shutting down.`;
                     break;
