@@ -83,6 +83,7 @@ export default (function(root) {
     _public.sendObject = function(objectToSend) {
         if (_isActive) {
             _cache.push(objectToSend);
+            Helpers.console(objectToSend, 'Dispatcher', true);
 
             if (_cache.length >= Defaults.dispatcher.cacheSize) {
                 _flushCache();

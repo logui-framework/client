@@ -29,6 +29,14 @@ export default (function(root) {
 
         if (root.LogUI.Config.getConfigProperty('verbose') || isWarning) {
             var timeDelta = new Date().getTime() - root.LogUI.Config.getInitTimestamp();
+
+            if (typeof messageStr === 'object' && messageStr !== null) {
+                consoleFunction(`LogUI${currentStateString} @ ${timeDelta}ms > Logged object below`);
+                consoleFunction(messageStr);
+                
+                return;
+            }
+
             consoleFunction(`LogUI${currentStateString} @ ${timeDelta}ms > ${messageStr}`);
         }
     };
