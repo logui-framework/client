@@ -70,26 +70,10 @@
     <script src="../reactapp.bundle.js"></script>
     <script>
 
-        // LogUI.EventHandlers.somePluginAdded = (function(event) {
-        //     var _public = {};
-        //     var _timestamp = new Date().getTime();
-
-        //     _public.someFn = function() {
-        //         return Config.getTrackingConfig();
-        //     }
-
-        //     function _private() {
-        //         return 2*3;
-        //     }
-
-        //     return _public;
-        // })();
-
         var config = {
             logUIConfiguration: {
-                endpoint: 'ws://127.0.0.1:8000/endpoint/',
-                authenticationToken: 'eyJ0eXBlIjoibG9nVUktYXV0aGVudGljYXRpb24tb2JqZWN0IiwiYXBwbGljYXRpb25JRCI6ImY1YTNhZTI1LTkwYmQtNDBjYS05Mzg4LTMwYzhiNzcyODVkZiIsImZsaWdodElEIjoiOWUzMmRiNDMtMWFmNS00YzkyLThkODYtNTNkOWZiZjQyZTkxIn0:1lJGwW:3mY6TrzEul4UIYjcZvKd8TT1h0l9FxlWaj5YSVXqdPY',
-                //consoleElement: '#console-list',
+                endpoint: 'ws://linuxvm:8000/ws/endpoint/',
+                authenticationToken: 'TOKEN HERE!',
                 verbose: true,
 
                 browserEvents: {
@@ -107,22 +91,18 @@
                 userID: 'userid',
                 condition: 3,
                 rotation: 1,
-                experimentID: 'experimentIDString',
-                applicationState: {
-                    
-                }
             },
             trackingConfiguration: {
-                'firstComponent': {
+                'testBoxHover': {
                     selector: '.test',
                     event: 'mouseHover',
                     properties: {
                         blockEventBubbling: true,
                         mouseover: {
-                            name: 'COMPONENT_MOUSE_OVER',
+                            name: 'TEST_BOX_MOUSE_IN',
                         },
                         mouseout: {
-                            name: 'COMPONENT_MOUSE_OUT',
+                            name: 'TEST_BOX_MOUSE_OUT',
                         }
                     },
                     metadata: [
@@ -134,27 +114,10 @@
                     ],
                 },
 
-                'blah': {
+                'textBox1Click': {
                     selector: '#test-click-box1',
-                    event: 'mouseover',
-                    name: 'SOME_BLAH_HOVERIN',
-                    metadata: [
-                        {
-                            nameForLog: 'LOG_AS_NAME',
-                            sourcer: 'elementAttribute',
-                            lookFor: 'data-test-attribute',
-                        },
-                        {
-                            nameForLog: 'SOME_LOCAL_NAME',
-                            sourcer: 'localStorage',
-                            lookFor: 'testVarInLocal',
-                        },
-                        {
-                            nameForLog: 'A_NEW_NAME',
-                            sourcer: 'sessionStorage',
-                            lookFor: 'sess',
-                        }
-                    ],
+                    event: 'click',
+                    name: 'BOX_1_CLICK!',
                 },
 
                 'clockHover': {
@@ -173,13 +136,7 @@
                             lookFor: 'sampleProp',
                         }
                     ],
-                }
-
-
-                // 'something': {
-                //     selector: '#test-dommanipulation-box2',
-                //     event: 'somethingelse',
-                // },
+                },
             },
         };
     </script>
