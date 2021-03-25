@@ -33,27 +33,31 @@ export default (function(root) {
         }
     };
 
+    _public.getMetadataValue = function(element, entryConfig) {
+        let selectedSourcer = getSourcer(entryConfig.sourcer);
+
+        if (!selectedSourcer) {
+            return;
+        }
+
+        if (!entryConfig.hasOwnProperty('nameForLog') || !entryConfig.hasOwnProperty('lookFor')) {
+            return;
+        }
+
+        return selectedSourcer.getObject(element, entryConfig);
+    };
+
     _public.getMetadata = function(element, trackingConfig) {
         let returnArray = [];
         let observedNames = [];
 
         if (trackingConfig.hasOwnProperty('metadata')) {
             for (let entry of trackingConfig.metadata) {
-                let selectedSourcer = getSourcer(entry.sourcer);
-
-                if (!selectedSourcer) {
-                    continue;
-                }
-
-                if (!entry.hasOwnProperty('nameForLog') || !entry.hasOwnProperty('lookFor')) {
-                    continue;
-                }
+                let objectToPush = _public.getMetadataValue(element, entry);
 
                 if (observedNames.includes(entry.nameForLog)) {
                     continue;
                 }
-
-                let objectToPush = selectedSourcer.getObject(element, entry);
 
                 if (objectToPush) {
                     returnArray.push(objectToPush);
@@ -77,5 +81,3 @@ export default (function(root) {
 
     return _public;
 })(window);
-
-// Build a very simple react app (clock or something with a button)
