@@ -235,7 +235,11 @@ export default (function(root) {
         },
 
         has: function(propertyName) {
-            return _browserEvents.hasOwnProperty(propertyName);
+            if (_browserEvents) {
+                return _browserEvents.hasOwnProperty(propertyName);
+            }
+            
+            return false;
         },
     }
 
