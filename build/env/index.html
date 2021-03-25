@@ -56,6 +56,16 @@
                         <div id="test-reactapp-container"></div>
                     </div>
                 </div>
+                <div id="container-test-listofelements" class="group-container">
+                    <h2>List of Elements</h2>
+                    <div>
+                        <ul id="listofelements">
+                            <li>List item 1 <span>Nested!</span></li>
+                            <li>List item 2 <span>Nested!</span></li>
+                            <li>List item 3 <span>Nested!</span></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -73,7 +83,7 @@
         var config = {
             logUIConfiguration: {
                 endpoint: 'ws://linuxvm:8000/ws/endpoint/',
-                authenticationToken: 'TOKEN HERE!',
+                authenticationToken: 'eyJ0eXBlIjoibG9nVUktYXV0aGVudGljYXRpb24tb2JqZWN0IiwiYXBwbGljYXRpb25JRCI6IjJhZGZkOGEyLWRlOWUtNDRiNS05ZTg2LTAzNTI4OGY2ZTcxZiIsImZsaWdodElEIjoiZWZmMWQwNDEtNmUzZS00NmFmLTk1MTAtOWRlNWUwNTc4MGExIn0:1lPXp2:v9gt6oZNSUtEr9UkXsm406FTyrl65DcDrPJrTQZ24MQ',
                 verbose: true,
 
                 browserEvents: {
@@ -82,7 +92,7 @@
                     URLChanges: true,
                     contextMenu: true,
                     pageFocus: true,
-                    trackCursor: true,
+                    trackCursor: false,
                     cursorUpdateFrequency: 2000,
                     cursorLeavingPage: true,
                 }
@@ -136,6 +146,11 @@
                             lookFor: 'sampleProp',
                         }
                     ],
+                },
+
+                'listhover': {
+                    selector: '#listofelements li',
+                    event: 'mouseHover',
                 },
             },
         };

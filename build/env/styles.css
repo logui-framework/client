@@ -186,3 +186,12 @@ div#test-reactapp-clock {
     border-radius: 5px;
     margin-bottom: 5px;
 }
+
+ul#listofelements li {
+    background-color: grey;
+    margin-bottom: 5px;
+}
+
+ul#listofelements li span {
+    background-color: red;
+}
