@@ -1,10 +1,10 @@
 /*
     LogUI Client Library
-    Metadata Sourcers / DOM Element Sourcer
+    Metadata Sourcers / DOM Element Attribute Sourcer
 
     An IIFE function yielding a module for extracting attribute values from a given DOM element.
 
-    @module: DOM Element Sourcer Module
+    @module: DOM Element Attribute Sourcer Module
     @author: David Maxwell
     @date: 2021-03-05
 */
