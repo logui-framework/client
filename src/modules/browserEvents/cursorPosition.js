@@ -43,6 +43,7 @@ export default (function(root) {
                 root.document.addEventListener('mouseenter', pageEnterCallback);
             }
 
+            console.log('init');
             intervalTimerSet();
         }
     };
@@ -77,7 +78,9 @@ export default (function(root) {
     };
 
     var intervalTimerSet = function() {
-        if (_updateFrequency) {
+        console.log('set timer');
+        console.log(_updateIntervalID);
+        if (_updateFrequency && !_updateIntervalID) {
             _updateIntervalID = setInterval(intervalTimerCallback, _updateFrequency); 
         }
     };
@@ -121,6 +124,7 @@ export default (function(root) {
         returnObject.type = 'cursorTracking';
         returnObject.trackingType = 'cursorEnteredViewport';
 
+        console.log('page enter callback');
         intervalTimerSet();
         EventPackager.packageBrowserEvent(returnObject);
     };
