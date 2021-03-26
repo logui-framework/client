@@ -12,4 +12,8 @@ This Markdown file contains the `CHANGELOG` for the LogUI client library. Change
     * package.json contains the necessary infrastructure to build and test the project.
     * Sample test sample.spec.js included.
     * .gitignore is included.
+
+2021-03-26  Version 0.5.0
+
+    Basic implementation now complete. All basic functionality has been included, along with communicative ability to the LogUI server component.
 ```
