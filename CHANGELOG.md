@@ -16,4 +16,10 @@ This Markdown file contains the `CHANGELOG` for the LogUI client library. Change
 2021-03-26  Version 0.5.0
 
     Basic implementation now complete. All basic functionality has been included, along with communicative ability to the LogUI server component.
+
+2021-03-26  Version 0.5.1
+
+    Works with LogUI server version 0.5.1 and above.
+
+    Altered the configuration object to include an authorisation token, not an authentication token. Tidying up terminology.
 ```

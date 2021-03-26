@@ -17,7 +17,7 @@ import ValidationSchemas from '../validationSchemas';
 
 Defaults.dispatcher = {
     endpoint: null,  // The URL of the WebSocket endpoint to send data to.
-    authenticationToken: null,  // The string representing the authentication token to connect to the endpoint with.
+    authorisationToken: null,  // The string representing the authentication token to connect to the endpoint with.
     cacheSize: 10,  // The maximum number of stored events that can be in the cache before flushing.
     maximumCacheSize: 1000,  // When no connection is present, this is the cache size we shut down LogUI at.
     reconnectAttempts: 5,  // The maximum number of times we should try to reconnect.
@@ -27,7 +27,7 @@ Defaults.dispatcher = {
 RequiredFeatures.addFeature('WebSocket');
 
 ValidationSchemas.addLogUIConfigProperty('endpoint', 'string');
-ValidationSchemas.addLogUIConfigProperty('authenticationToken', 'string');
+ValidationSchemas.addLogUIConfigProperty('authorisationToken', 'string');
 
 export default (function(root) {
     var _public = {};
@@ -252,7 +252,7 @@ export default (function(root) {
             
             let payload = {
                 clientVersion: '__buildVersion__',
-                authenticationToken: Config.getConfigProperty('authenticationToken'),
+                authorisationToken: Config.getConfigProperty('authorisationToken'),
                 pageOrigin: root.location.origin,
                 userAgent: root.navigator.userAgent,
                 clientTimestamp: new Date(),
