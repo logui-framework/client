@@ -16,11 +16,11 @@ We're thrilled that you're using LogUI in your experiments! We ask that in retur
 
 ```bibtex
 @inproceedings{maxwell2021logui,
-    author = {Maxwell, David and Hauff, Claudia},
-    title = "{LogUI: Contemporary Logging Infrastructure for Web-Based Experiments}",
-    booktitle = {Proceedings of the 43\textsuperscript{th} ECIR},
-    year = {2021},
-    note={(In press)},
+    author={Maxwell, David and Hauff, Claudia},
+    title="{LogUI: Contemporary Logging Infrastructure for Web-Based Experiments}",
+    booktitle= {Advances in Information Retrieval (Proc. ECIR)},
+    year="2021",
+    pages="525--530",
 }
 ```
 
