@@ -83,7 +83,7 @@ export default (function(root) {
     _public.sendObject = function(objectToSend) {
         if (_isActive) {
             _cache.push(objectToSend);
-            Helpers.console(objectToSend, 'Dispatcher', true);
+            Helpers.console(objectToSend, 'Dispatcher', false);
 
             if (_cache.length >= Defaults.dispatcher.cacheSize) {
                 _flushCache();
@@ -106,7 +106,7 @@ export default (function(root) {
 
     var _tidyWebsocket = function() {
         if (_websocket) {
-            Helpers.console(`The connection to the server is being closed.`, 'Dispatcher', true);
+            Helpers.console(`The connection to the server is being closed.`, 'Dispatcher', false);
 
             _websocket.removeEventListener('close', _callbacks.onClose);
             _websocket.removeEventListener('error', _callbacks.onError);
@@ -129,7 +129,7 @@ export default (function(root) {
                             case 0:
                                 return;
                             case 1:
-                                Helpers.console(`The connection to the server has been (re-)established.`, 'Dispatcher', true);
+                                Helpers.console(`The connection to the server has been (re-)established.`, 'Dispatcher', false);
 
                                 clearInterval(_websocketReconnectionReference);
                                 _websocketReconnectionAttempts = 0;
@@ -155,7 +155,7 @@ export default (function(root) {
 
                     }
                     
-                    Helpers.console(`(Re-)connection attempt ${_websocketReconnectionAttempts} of ${Defaults.dispatcher.reconnectAttempts}`, 'Dispatcher', true);
+                    Helpers.console(`(Re-)connection attempt ${_websocketReconnectionAttempts} of ${Defaults.dispatcher.reconnectAttempts}`, 'Dispatcher', false);
                     _initWebsocket();
                 }
                 else {
@@ -172,7 +172,7 @@ export default (function(root) {
 
     var _callbacks = {
         onClose: function(event) {
-            Helpers.console(`The connection to the server has been closed.`, 'Dispatcher', true);
+            Helpers.console(`The connection to the server has been closed.`, 'Dispatcher', false);
 
             let errorMessage = 'Something went wrong with the connection to the LogUI server.'
 
@@ -184,7 +184,7 @@ export default (function(root) {
                     errorMessage = 'The client sent a bad application handshake to the server. LogUI is shutting down.';
                     break;
                 case 4003:
-                    errorMessage = 'The LogUI server being connected to does not support v__buildVersion__ of the client. LogUI is shutting down.';
+                    errorMessage = 'The LogUI server being connected to does not support version __buildVersion__ of the client. LogUI is shutting down.';
                     break;
                 case 4004:
                     errorMessage = 'A bad authentication token was provided to the LogUI server. LogUI is shutting down.';
@@ -224,7 +224,7 @@ export default (function(root) {
 
             switch (messageObject.type) {
                 case 'handshakeSuccess':
-                    Helpers.console(`The handshake was successful. Hurray! The server is listening.`, 'Dispatcher', true);
+                    Helpers.console(`The handshake was successful. Hurray! The server is listening.`, 'Dispatcher', false);
                     Config.sessionData.setID(messageObject.payload.sessionID);
 
                     if (messageObject.payload.newSessionCreated) {
@@ -248,7 +248,7 @@ export default (function(root) {
             _websocketSuccessfulReconnections += 1;
             let sessionID = Config.sessionData.getSessionIDKey();
 
-            Helpers.console(`The connection to the server has been established.`, 'Dispatcher', true);
+            Helpers.console(`The connection to the server has been established.`, 'Dispatcher', false);
             
             let payload = {
                 clientVersion: '__buildVersion__',
@@ -262,7 +262,7 @@ export default (function(root) {
                 payload.sessionID = Config.sessionData.getSessionIDKey();
             }
 
-            Helpers.console(`The LogUI handshake has been sent.`, 'Dispatcher', true);
+            Helpers.console(`The LogUI handshake has been sent.`, 'Dispatcher', false);
             _websocket.send(JSON.stringify(_getMessageObject('handshake', payload)));
         },
 
@@ -279,7 +279,7 @@ export default (function(root) {
     var _flushCache = function() {
         if (!_websocket || _websocket.readyState != 1) {
             if (_cache.length >= Defaults.dispatcher.maximumCacheSize) {
-                Helpers.console(`The cache has grown too large, with no connection to clear it. LogUI will now stop; any cached events will be lost.`, 'Dispatcher', true);
+                Helpers.console(`The cache has grown too large, with no connection to clear it. LogUI will now stop; any cached events will be lost.`, 'Dispatcher', false);
                 root.dispatchEvent(new Event('logUIShutdownRequest'));
             }
 
@@ -292,7 +292,7 @@ export default (function(root) {
         };
 
         _websocket.send(JSON.stringify(_getMessageObject('logEvents', payload)));
-        Helpers.console(`Cache flushed.`, 'Dispatcher', true);
+        Helpers.console(`Cache flushed.`, 'Dispatcher', false);
 
         _cache = [];
     };

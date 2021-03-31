@@ -22,4 +22,11 @@ This Markdown file contains the `CHANGELOG` for the LogUI client library. Change
     Works with LogUI server version 0.5.1 and above.
 
     Altered the configuration object to include an authorisation token, not an authentication token. Tidying up terminology.
+
+2021-03-31  Version 0.5.2
+
+    Works with LogUI server version 0.5.1 and above.
+
+    Altered the behaviour of the eventCallbackHandler to prevent event bubbling.
+    Updated the websocketDispatcher to suppress logging when verbose is set to false.
 ```
