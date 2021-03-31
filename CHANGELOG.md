@@ -23,7 +23,7 @@ This Markdown file contains the `CHANGELOG` for the LogUI client library. Change
 
     Altered the configuration object to include an authorisation token, not an authentication token. Tidying up terminology.
 
-2021-03-31  Version 0.5.2
+2021-03-31  Version 0.5.2a
 
     Works with LogUI server version 0.5.1 and above.
 
