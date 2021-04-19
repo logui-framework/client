@@ -30,8 +30,6 @@ export default (function(root) {
             return;
         }
 
-        console.log(browserEvent.eventPhase);
-
         // Can we work out what the call is for, and check?
         // like if we have a click on green, and a click on body, the element itself takes precedence?
         // So if there are multiple ones, can we use CSS specificty to work out what one to take forward?
