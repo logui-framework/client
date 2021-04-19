@@ -51,6 +51,7 @@ const SCHEMA_SUPPLIED_CONFIG_LOGUI_BROWSEREVENTS = {
         trackCursor: {'type': 'boolean'},
         cursorUpdateFrequency: {'type': 'number'},
         cursorLeavingPage: {'type': 'boolean'},
+        pageResize: {'type': 'boolean'},
     },
     required: [],
 }
