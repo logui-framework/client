@@ -42,6 +42,8 @@ export default (function(root) {
     _handler.logUIEventCallback = function(eventContext, browserEvent, trackingConfig) {
         let element = eventContext;
 
+        // If tracking has the element in question, we know there's already a queue. So we should add to it.
+        // We shouldn't log here, as the queue is non-zero. So we add to it, and simply return.
         if (tracking.has(element)) {
             let existing = tracking.get(element);
             
@@ -56,6 +58,8 @@ export default (function(root) {
             return;
         }
 
+        // If we get here, we know that the element has not yet been tracked.
+        // We can create the necessary data structure to track its scrolling interactions, and fire off an event for the start of scrolling.
         let handle = (setTimeout(() => {
             endScrollEvent(element, handle);
         }, DELAY_TIME));
