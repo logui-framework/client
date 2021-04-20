@@ -1,6 +1,6 @@
 {
   "name": "logui",
-  "version": "0.5.3c",
+  "version": "0.5.3d",
   "description": "A framework-agnostic client-side JavaScript library for logging user interactions on webpages.",
   "main": "./src/main.js",
   "scripts": {

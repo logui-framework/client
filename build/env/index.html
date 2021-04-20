@@ -66,6 +66,43 @@
                         </ul>
                     </div>
                 </div>
+                <div id="container-test-convoluted" class="group-container">
+                    <h2>List of Elements (Convoluted)</h2>
+                    <div>
+                        <div id="convoluted-list-container">
+                            <div class="list">
+                                <div class="item">
+                                    <span class="text">
+                                        <a href="#" data-rank="1" id="conv-first-item">List item one</a>
+                                    </span>
+                                </div>
+                                <div class="item">
+                                    <span class="text">
+                                        <a href="#" data-rank="2">List item two</a>
+                                    </span>
+                                </div>
+                                <div class="item">
+                                    <span class="text">
+                                        <a href="#" data-rank="3">List item three</a>
+                                    </span>
+                                </div>
+                                <div class="item">
+                                    <span class="text">
+                                        <a href="#" data-rank="4">List item four</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="container-scrollable" class="group-container">
+                    <h2>Scrollable Element</h2>
+
+                    <div id="scrollable-element">
+                        This is a scrollable element. You should be able to scroll along the y axis to see more content. Look at the interaction logs to see the scroll events that are recorded. We should see a start and stop scroll event; not a multitude of scroll events that are recorded.
+                        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -83,7 +120,7 @@
         var config = {
             logUIConfiguration: {
                 endpoint: 'ws://linuxvm:8000/ws/endpoint/',
-                authorisationToken: 'eyJ0eXBlIjoibG9nVUktYXV0aG9yaXNhdGlvbi1vYmplY3QiLCJhcHBsaWNhdGlvbklEIjoiMmFkZmQ4YTItZGU5ZS00NGI1LTllODYtMDM1Mjg4ZjZlNzFmIiwiZmxpZ2h0SUQiOiJlZmYxZDA0MS02ZTNlLTQ2YWYtOTUxMC05ZGU1ZTA1NzgwYTEifQ:1lPqbC:hditvPBroN52nsPaG_RXy4byc-sKss2MGIYwCIwA9DA',
+                authorisationToken: 'eyJ0eXBlIjoibG9nVUktYXV0aG9yaXNhdGlvbi1vYmplY3QiLCJhcHBsaWNhdGlvbklEIjoiZjNlMmNiYjktZmZhMC00MDFkLWFiZDEtNWJiNTJmNWNlMzM1IiwiZmxpZ2h0SUQiOiIwOTFkMmJjNC0zY2YwLTRjM2QtODkwYy0zZmVkYjA2YjAwODEifQ:1lYWSW:9Uj3CoiRBiQEBDfxdB2K-tevEumINglpObCGyHLcWww',
                 verbose: true,
 
                 browserEvents: {
@@ -95,6 +132,7 @@
                     trackCursor: false,
                     cursorUpdateFrequency: 2000,
                     cursorLeavingPage: true,
+                    pageResize: false,
                 }
             },
             applicationSpecificData: {
@@ -103,6 +141,39 @@
                 rotation: 1,
             },
             trackingConfiguration: {
+                'convolutedHover': {
+                    selector: '#convoluted-list-container .list .item .text a',
+                    event: 'mouseHover',
+                    properties: {
+                        mouseenter: {
+                            name: 'CONV_ITEM_IN',
+                        },
+                        mouseleave: {
+                            name: 'CONV_ITEM_OUT',
+                        }
+                    },
+                    metadata: [
+                        {
+                            nameForLog: 'POSITION',
+                            sourcer: 'elementAttribute',
+                            lookFor: 'data-rank',
+                        }
+                    ],
+                },
+
+                'scroll-box': {
+                    selector: '#scrollable-element',
+                    event: 'scrollable',
+                    properties: {
+                        scrollStart: {
+                            name: 'SCROLL_START_NAME',
+                        },
+                        scrollEnd: {
+                            name: 'SCROLL_END_NAME',
+                        },
+                    }
+                },
+
                 'testBoxHover': {
                     selector: '.test',
                     event: 'mouseHover',
