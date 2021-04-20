@@ -41,10 +41,23 @@ export default (function(root) {
                 for (let element of record.addedNodes) {
                     if (element.nodeType == 1) {
                         processAddedElement(element);
+
+                        // There may be child elements that need to be processed, too.
+                        // The recurive function processDescendants handles this.
+                        processDescendants(element);
                     }
                 }
             }
         }
+    };
+
+    var processDescendants = function(element) {
+        let childArray = Array.from(element.children);
+
+        childArray.forEach((childElement) => {
+            processAddedElement(childElement);
+            processDescendants(childElement);
+        });
     };
 
     var processAddedElement = function(element) {
