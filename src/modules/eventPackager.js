@@ -33,6 +33,15 @@ export default (function(root) {
         Dispatcher.sendObject(packageObject);
     };
 
+    _public.packageCustomEvent = function(eventDetails) {
+        let packageObject = getBasicPackageObject();
+
+        packageObject.eventType = 'customEvent';
+        packageObject.eventDetails = eventDetails;
+
+        Dispatcher.sendObject(packageObject);
+    }
+
     _public.packageBrowserEvent = function(eventDetails) {
         let packageObject = getBasicPackageObject();
 

@@ -80,8 +80,12 @@ export default (function(root) {
         root.dispatchEvent(new Event('logUIStopped'));
     };
 
-    _public.logCustomMessage = function(message) {
-
+    _public.logCustomMessage = function(messageObject) {
+        if (!_public.isActive()) {
+            throw Error('Custom messages may only be logged when the LogUI client is active.');
+        }
+        
+        EventPackager.packageCustomEvent(messageObject);
     };
 
     _public.updateApplicationSpecificData = function(updatedObject) {
