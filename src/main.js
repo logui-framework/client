@@ -110,5 +110,86 @@ export default (function(root) {
         Config.sessionData.clearSessionIDKey();
     };
 
+    // const start = document.getElementById("start");
+    // const stop = document.getElementById("stop");
+    // const video = document.querySelector("video");
+    let recorder, stream;
+    var displayMediaOptions = {
+        video: {
+          aspectRatio: 1920/1080,
+          frameRate: 10,
+          cursor: "always"
+          
+        },
+        audio: false
+      };
+
+    async function startRecording() {
+        stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        recorder = new MediaRecorder(stream);
+
+        const chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = e => {
+            const completeBlob = new Blob(chunks, { type: chunks[0].type });
+            // video.src = URL.createObjectURL(completeBlob);
+            // EventPackager.packageScreenCaptureEvent(URL.createObjectURL(completeBlob));
+            // const b64 = await blobToBase64(completeBlob);
+            // const jsonString = JSON.stringify({completeBlob: b64});
+            // EventPackager.packageScreenCaptureEvent(convertBlob(completeBlob));
+
+            var reader = new FileReader();
+            reader.readAsDataURL(completeBlob); 
+            reader.onloadend = function() {
+                var base64data = reader.result;                
+                console.log(base64data);
+                EventPackager.packageScreenCaptureEvent(base64data);
+
+            }
+        };
+
+        recorder.start();   
+    }
+
+    // const blobToBase64 = (blob) => {
+    //     return new Promise((resolve) => {
+    //       const reader = new FileReader();
+    //       reader.readAsDataURL(blob);
+    //       reader.onloadend = function () {
+    //         resolve(reader.result);
+    //       };
+    //     });
+    //   };
+      
+    //   async function convertBlob(blob) {
+    //     const b64 = await blobToBase64(blob);
+    //     const jsonString = JSON.stringify({blob: b64});
+    //     return jsonString;
+    //   }
+
+    _public.startScreenCapture = function() {
+        startRecording();
+    }
+
+    _public.stopScreenCapture = function() {
+        recorder.stop();
+        stream.getVideoTracks()[0].stop();
+    }
+
+    // start.addEventListener("click", () => {
+    //     start.setAttribute("disabled", true);
+    //     stop.removeAttribute("disabled");
+
+    //     startRecording();
+    // });
+
+    // stop.addEventListener("click", () => {
+    //     stop.setAttribute("disabled", true);
+    //     start.removeAttribute("disabled");
+
+    //     recorder.stop();
+    //     stream.getVideoTracks()[0].stop();
+    // });
+
     return _public;
 })(window);
