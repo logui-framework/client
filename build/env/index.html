@@ -103,6 +103,13 @@
                         <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
                     </div>
                 </div>
+                <div id="container-mouseclick" class="group-container">
+                    <h2>Mouse Clicks</h2>
+
+                    <div id="left-click-box">Left Click</div>
+                    <div id="centre-click-box">Centre Click</div>
+                    <div id="right-click-box">Right Click</div>
+                </div>
             </div>
 
         </main>
@@ -130,7 +137,7 @@
                     contextMenu: true,
                     pageFocus: true,
                     trackCursor: false,
-                    cursorUpdateFrequency: 2000,
+                    cursorUpdateFrequency: 500,
                     cursorLeavingPage: true,
                     pageResize: false,
                 }
@@ -141,87 +148,123 @@
                 rotation: 1,
             },
             trackingConfiguration: {
-                'convolutedHover': {
-                    selector: '#convoluted-list-container .list .item .text a',
-                    event: 'mouseHover',
-                    properties: {
-                        mouseenter: {
-                            name: 'CONV_ITEM_IN',
-                        },
-                        mouseleave: {
-                            name: 'CONV_ITEM_OUT',
-                        }
-                    },
-                    metadata: [
-                        {
-                            nameForLog: 'POSITION',
-                            sourcer: 'elementAttribute',
-                            lookFor: 'data-rank',
-                        }
-                    ],
+
+                'clickTest': {
+                    selector: '#test-click-box1',
+                    event: 'mouseClick',
                 },
 
-                'scroll-box': {
-                    selector: '#scrollable-element',
-                    event: 'scrollable',
+                // 'convolutedHover': {
+                //     selector: '#convoluted-list-container .list .item .text a',
+                //     event: 'mouseHover',
+                //     properties: {
+                //         mouseenter: {
+                //             name: 'CONV_ITEM_IN',
+                //         },
+                //         mouseleave: {
+                //             name: 'CONV_ITEM_OUT',
+                //         }
+                //     },
+                //     metadata: [
+                //         {
+                //             nameForLog: 'POSITION',
+                //             sourcer: 'elementAttribute',
+                //             lookFor: 'data-rank',
+                //         }
+                //     ],
+                // },
+
+                // 'scroll-box': {
+                //     selector: '#scrollable-element',
+                //     event: 'scrollable',
+                //     properties: {
+                //         scrollStart: {
+                //             name: 'SCROLL_START_NAME',
+                //         },
+                //         scrollEnd: {
+                //             name: 'SCROLL_END_NAME',
+                //         },
+                //     }
+                // },
+
+                // 'testBoxHover': {
+                //     selector: '.test',
+                //     event: 'mouseHover',
+                //     properties: {
+                //         blockEventBubbling: true,
+                //         mouseover: {
+                //             name: 'TEST_BOX_MOUSE_IN',
+                //         },
+                //         mouseout: {
+                //             name: 'TEST_BOX_MOUSE_OUT',
+                //         }
+                //     },
+                //     metadata: [
+                //         {
+                //             logAs: 'LOG_NAME',
+                //             source: 'elementAttribute',
+                //             find: 'attributeName'
+                //         }
+                //     ],
+                // },
+
+                // 'textBox1Click': {
+                //     selector: '#test-click-box1',
+                //     event: 'click',
+                //     name: 'BOX_1_CLICK!',
+                // },
+
+                // 'clockHover': {
+                //     selector: '#test-reactapp-clock',
+                //     event: 'mouseover',
+                //     name: 'CLOCK_HOVER_TIME',
+                //     metadata: [
+                //         {
+                //             nameForLog: 'CURRENT_TIME',
+                //             sourcer: 'reactComponentState',
+                //             lookFor: 'time',
+                //         },
+                //         {
+                //             nameForLog: 'PROP_TEST',
+                //             sourcer: 'reactComponentProp',
+                //             lookFor: 'sampleProp',
+                //         }
+                //     ],
+                // },
+
+                // 'listhover': {
+                //     selector: '#listofelements li',
+                //     event: 'mouseHover',
+                // },
+
+                'clickBox-left': {
+                    selector: '#left-click-box',
+                    event: 'mouseClick',
                     properties: {
-                        scrollStart: {
-                            name: 'SCROLL_START_NAME',
-                        },
-                        scrollEnd: {
-                            name: 'SCROLL_END_NAME',
+                        primary: {
+                            name: 'CLICK_LEFT',
                         },
                     }
                 },
 
-                'testBoxHover': {
-                    selector: '.test',
-                    event: 'mouseHover',
+                'clickBox-centre': {
+                    selector: '#centre-click-box',
+                    event: 'mouseClick',
                     properties: {
-                        blockEventBubbling: true,
-                        mouseover: {
-                            name: 'TEST_BOX_MOUSE_IN',
+                        auxiliary: {
+                            name: 'CLICK_CENTRE',
                         },
-                        mouseout: {
-                            name: 'TEST_BOX_MOUSE_OUT',
-                        }
-                    },
-                    metadata: [
-                        {
-                            logAs: 'LOG_NAME',
-                            source: 'elementAttribute',
-                            find: 'attributeName'
-                        }
-                    ],
+                    }
                 },
 
-                'textBox1Click': {
-                    selector: '#test-click-box1',
-                    event: 'click',
-                    name: 'BOX_1_CLICK!',
-                },
-
-                'clockHover': {
-                    selector: '#test-reactapp-clock',
-                    event: 'mouseover',
-                    name: 'CLOCK_HOVER_TIME',
-                    metadata: [
-                        {
-                            nameForLog: 'CURRENT_TIME',
-                            sourcer: 'reactComponentState',
-                            lookFor: 'time',
+                'clickBox-right': {
+                    selector: '#right-click-box',
+                    event: 'mouseClick',
+                    properties: {
+                        secondary: {
+                            name: 'CLICK_RIGHT',
                         },
-                        {
-                            nameForLog: 'PROP_TEST',
-                            sourcer: 'reactComponentProp',
-                            lookFor: 'sampleProp',
-                        }
-                    ],
-                },
-
-                'listhover': {
-                    selector: '#listofelements li',
-                    event: 'mouseHover',
+                    }
                 },
             },
         };
