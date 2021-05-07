@@ -82,11 +82,25 @@ export default (function(root) {
 
     _public.sendObject = function(objectToSend) {
         if (_isActive) {
-            _cache.push(objectToSend);
-            Helpers.console(objectToSend, 'Dispatcher', false);
+            if(objectToSend instanceof Blob){
+                // let payload = {
+                //     item: objectToSend,
+                // };
+                _websocket.send(objectToSend);
+                Helpers.console(objectToSend, 'Dispatcher', false);
+            } 
+            // else if (objectToSend['eventType'] = 'screenCaptureEvent'){
+            //     _websocket.send(objectToSend);
+            //     Helpers.console(objectToSend, 'Dispatcher', false);
+            //     _cache.push(objectToSend);
+            // } 
+            else{
+                _cache.push(objectToSend);
+                Helpers.console(objectToSend, 'Dispatcher', false);
 
-            if (_cache.length >= Defaults.dispatcher.cacheSize) {
-                _flushCache();
+                if (_cache.length >= Defaults.dispatcher.cacheSize) {
+                    _flushCache();
+                }
             }
 
             return;
