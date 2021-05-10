@@ -83,17 +83,9 @@ export default (function(root) {
     _public.sendObject = function(objectToSend) {
         if (_isActive) {
             if(objectToSend instanceof Blob){
-                // let payload = {
-                //     item: objectToSend,
-                // };
                 _websocket.send(objectToSend);
                 Helpers.console(objectToSend, 'Dispatcher', false);
             } 
-            // else if (objectToSend['eventType'] = 'screenCaptureEvent'){
-            //     _websocket.send(objectToSend);
-            //     Helpers.console(objectToSend, 'Dispatcher', false);
-            //     _cache.push(objectToSend);
-            // } 
             else{
                 _cache.push(objectToSend);
                 Helpers.console(objectToSend, 'Dispatcher', false);

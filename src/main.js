@@ -6,6 +6,7 @@ import MetadataHandler from './modules/metadataHandler';
 import SpecificFrameworkEvents from './modules/specificFrameworkEvents';
 import EventHandlerController from './modules/eventHandlerController';
 import RecordRTCPromisesHandler from 'recordrtc';
+import eventPackager from './modules/eventPackager';
 
 export default (function(root) {
     var _public = {};
@@ -115,7 +116,7 @@ export default (function(root) {
     // const stop = document.getElementById("stop");
     // const video = document.querySelector("video");
     let recorder, stream;
-    var chunkCount = 0;
+    let startTime;
     var displayMediaOptions = {
         video: {
           aspectRatio: 1920/1080,
@@ -132,93 +133,37 @@ export default (function(root) {
         recorder = new RecordRTCPromisesHandler(stream, {
             type: 'video',
             timeSlice: 5000,
-            mimeType: 'video/webm',
+            mimeType: 'video/webm;',
             ondataavailable: async function(blob) {
-              // video.src = URL.createObjectURL(blob);
-              // invokeSaveAsDialog(blob);
-            //   var reader = new FileReader();
-                // reader.readAsDataURL(blob); 
-                // reader.onloadend = function() {
-                    // var base64data = reader.result;                
-                    // console.log(base64data);
-                    // let eventDetails = {
-                    //     chunk_number: chunkCount++
-                    // }
-                    // EventPackager.packageScreenCaptureEvent(eventDetails);
-                // }
-                var formData = new FormData();
-                blob.name = Config.sessionData.getSessionIDKey();
-                formData.append(Config.sessionData.getSessionIDKey(), blob, Config.sessionData.getSessionIDKey());
                 Dispatcher.sendObject(blob);
-            // var arrayBuffer = await blob.arrayBuffer()
-            // console.log(arrayBuffer);
-            //     let eventDetails = {
-            //         chunk_number: chunkCount++,
-            //         chunk: JSON.stringify(Array.from(new Uint8Array(arrayBuffer)))
-            //     }
-            //     EventPackager.packageScreenCaptureEvent(eventDetails);
-            
-            // var text = await blob.text()
-            // console.log(text);  
-            //     let eventDetails2 = {
-            //         chunk_number: chunkCount++,
-            //         chunk: text
-            //     }
-            //     EventPackager.packageScreenCaptureEvent(eventDetails2);
-            
+                var timeSinceStart = (new Date()).getTime() - startTime;
+                let timeSinceStartMS = timeSinceStart;
+                var secs = Math.floor(timeSinceStart/1000);
+                var mins = Math.floor(secs/60);
+                var hrs = Math.floor(mins/60);
+                timeSinceStart = timeSinceStart - secs*1000;
+                secs = secs - mins*60;
+                mins = mins - hrs*60;
+                // console.log("Time since start recording: " + hrs + ":" + mins +":" + secs +":" + timeSinceStart);
+                let timeString = hrs + ":" + mins +":" + secs +"." + timeSinceStart;
+
+                let eventDetails = {
+                    timeSinceStartRecording: {
+                        milliSeconds: timeSinceStartMS,
+                        formatted: timeString
+                    }
+                };
+
+                eventPackager.packageScreenCaptureEvent(eventDetails);
+        
+
             }
           });
 
-        // recorder.ondataavailable = e => chunks.push(e.data);
-        // recorder.onstop = e => {
-        //     const completeBlob = new Blob(chunks, { type: chunks[0].type });
-        //     // video.src = URL.createObjectURL(completeBlob);
-        //     // EventPackager.packageScreenCaptureEvent(URL.createObjectURL(completeBlob));
-        //     // const b64 = await blobToBase64(completeBlob);
-        //     // const jsonString = JSON.stringify({completeBlob: b64});
-        //     // EventPackager.packageScreenCaptureEvent(convertBlob(completeBlob));
-
-        //     var reader = new FileReader();
-        //     reader.readAsDataURL(completeBlob); 
-        //     reader.onloadend = function() {
-        //         var base64data = reader.result;                
-        //         console.log(base64data);
-        //         EventPackager.packageScreenCaptureEvent(base64data);
-
-        //     }
-        // };
-
-        recorder.startRecording();   
+        recorder.startRecording();  
+        startTime = (new Date()).getTime(); 
     }
 
-    // stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-    // let recorder = new RecordRTCPromisesHandler(stream, {
-    //     type: 'video'
-    // });
-    // recorder.startRecording();
-
-    // const sleep = m => new Promise(r => setTimeout(r, m));
-    // await sleep(3000);
-
-    // await recorder.stopRecording();
-    // let blob = await recorder.getBlob();
-    // invokeSaveAsDialog(blob);
-
-    // const blobToBase64 = (blob) => {
-    //     return new Promise((resolve) => {
-    //       const reader = new FileReader();
-    //       reader.readAsDataURL(blob);
-    //       reader.onloadend = function () {
-    //         resolve(reader.result);
-    //       };
-    //     });
-    //   };
-      
-    //   async function convertBlob(blob) {
-    //     const b64 = await blobToBase64(blob);
-    //     const jsonString = JSON.stringify({blob: b64});
-    //     return jsonString;
-    //   }
 
     _public.startScreenCapture = function() {
         startRecording();
