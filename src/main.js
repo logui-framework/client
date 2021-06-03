@@ -116,7 +116,7 @@ export default (function(root) {
     // const stop = document.getElementById("stop");
     // const video = document.querySelector("video");
     let recorder, stream;
-    let startTime;
+    // let startTime;
     var displayMediaOptions = {
         video: {
           aspectRatio: 1920/1080,
@@ -136,37 +136,38 @@ export default (function(root) {
             mimeType: 'video/webm;',
             ondataavailable: async function(blob) {
                 Dispatcher.sendObject(blob);
-                var timeSinceStart = (new Date()).getTime() - startTime;
-                let timeSinceStartMS = timeSinceStart;
-                var secs = Math.floor(timeSinceStart/1000);
-                var mins = Math.floor(secs/60);
-                var hrs = Math.floor(mins/60);
-                timeSinceStart = timeSinceStart - secs*1000;
-                secs = secs - mins*60;
-                mins = mins - hrs*60;
-                // console.log("Time since start recording: " + hrs + ":" + mins +":" + secs +":" + timeSinceStart);
-                let timeString = hrs + ":" + mins +":" + secs +"." + timeSinceStart;
+                // var timeSinceStart = (new Date()).getTime() - startTime;
+                // let timeSinceStartMS = timeSinceStart;
+                // var secs = Math.floor(timeSinceStart/1000);
+                // var mins = Math.floor(secs/60);
+                // var hrs = Math.floor(mins/60);
+                // timeSinceStart = timeSinceStart - secs*1000;
+                // secs = secs - mins*60;
+                // mins = mins - hrs*60;
+                // // console.log("Time since start recording: " + hrs + ":" + mins +":" + secs +":" + timeSinceStart);
+                // let timeString = hrs + ":" + mins +":" + secs +"." + timeSinceStart;
 
-                let eventDetails = {
-                    timeSinceStartRecording: {
-                        milliSeconds: timeSinceStartMS,
-                        formatted: timeString
-                    }
-                };
+                // let eventDetails = {
+                //     timeSinceStartRecording: {
+                //         milliSeconds: timeSinceStartMS,
+                //         formatted: timeString
+                //     }
+                // };
 
-                eventPackager.packageScreenCaptureEvent(eventDetails);
+                // eventPackager.packageScreenCaptureEvent(eventDetails);
         
 
             }
           });
 
         recorder.startRecording();  
-        startTime = (new Date()).getTime(); 
+        // startTime = (new Date()).getTime(); 
     }
 
 
-    _public.startScreenCapture = function() {
-        startRecording();
+    _public.startScreenCapture = async function() {
+        await startRecording();
+        Config.sessionData.setScreenCaptureTimestamp(new Date());
     }
 
     _public.stopScreenCapture = async function() {

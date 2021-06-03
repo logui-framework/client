@@ -60,19 +60,20 @@ export default (function(root) {
         Dispatcher.sendObject(packageObject);
     };
 
-    _public.packageScreenCaptureEvent = function(eventDetails) {
-        let packageObject = getBasicPackageObject();
+    // _public.packageScreenCaptureEvent = function(eventDetails) {
+    //     let packageObject = getBasicPackageObject();
 
-        packageObject.eventType = 'screenCaptureEvent';
-        packageObject.eventDetails = eventDetails;
+    //     packageObject.eventType = 'screenCaptureEvent';
+    //     packageObject.eventDetails = eventDetails;
 
-        Dispatcher.sendObject(packageObject);
-    };
+    //     Dispatcher.sendObject(packageObject);
+    // };
 
     var getBasicPackageObject = function() {
         let currentTimestamp = new Date();
         let sessionStartTimestamp = Config.sessionData.getSessionStartTimestamp();
         let libraryStartTimestamp = Config.sessionData.getLibraryStartTimestamp();
+        let screenCaptureStartTimestamp = Config.sessionData.getScreenCaptureStartTimestamp();
         
         return {
             eventType: null,
@@ -82,6 +83,7 @@ export default (function(root) {
                 eventTimestamp: currentTimestamp,
                 sinceSessionStartMillis: currentTimestamp - sessionStartTimestamp,
                 sinceLogUILoadMillis: currentTimestamp - libraryStartTimestamp,
+                sinceScreenCaptureStartMillis: (screenCaptureStartTimestamp == undefined) ? undefined : currentTimestamp - screenCaptureStartTimestamp,
             },
             applicationSpecificData: Config.applicationSpecificData.get(),
         }

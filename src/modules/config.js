@@ -185,6 +185,7 @@ export default (function(root) {
                 IDkey: null,
                 sessionStartTimestamp: null,
                 libraryStartTimestamp: null,
+                screenCaptureStartTimestamp: null,
             };
 
             _public.sessionData.getSessionIDKey();
@@ -215,6 +216,10 @@ export default (function(root) {
             _sessionData.sessionStartTimestamp = sessionStartTimestamp;
             _sessionData.libraryStartTimestamp = libraryLoadTimestamp;
         },
+        
+        setScreenCaptureTimestamp: function(screenCaptureStartTimestamp){
+            _sessionData.screenCaptureStartTimestamp = screenCaptureStartTimestamp;
+        },
 
         getSessionStartTimestamp: function() {
             return _sessionData.sessionStartTimestamp;
@@ -222,6 +227,10 @@ export default (function(root) {
 
         getLibraryStartTimestamp: function() {
             return _sessionData.libraryStartTimestamp;
+        },
+
+        getScreenCaptureStartTimestamp: function() {
+            return _sessionData.screenCaptureStartTimestamp;
         },
     }
 
