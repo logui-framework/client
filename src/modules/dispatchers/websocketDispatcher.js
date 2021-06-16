@@ -87,20 +87,20 @@ export default (function(root) {
             if(objectToSend instanceof Blob){
                 _blobcache.push(objectToSend);
                 Helpers.console(objectToSend, 'Dispatcher', false);
-                
-                if (_blobcache.length >= Defaults.dispatcher.cacheSize) {
-                    _flushCache();
-                }
+
+                // if (_blobcache.length >= Defaults.dispatcher.cacheSize) {
+                //     _flushCache();
+                // }
             } 
             else{
                 _cache.push(objectToSend);
                 Helpers.console(objectToSend, 'Dispatcher', false);
 
-                if (_cache.length >= Defaults.dispatcher.cacheSize) {
-                    _flushCache();
-                }
+                
             }
-
+            if (_cache.length + _blobcache.length >= Defaults.dispatcher.cacheSize) {
+                                _flushCache();
+                            }
             return;
         }
 
