@@ -112,11 +112,7 @@ export default (function(root) {
         Config.sessionData.clearSessionIDKey();
     };
 
-    // const start = document.getElementById("start");
-    // const stop = document.getElementById("stop");
-    // const video = document.querySelector("video");
     let recorder, stream;
-    // let startTime;
     var displayMediaOptions = {
         video: {
           aspectRatio: 1920/1080,
@@ -129,39 +125,24 @@ export default (function(root) {
 
     async function startRecording() {
         stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-        // recorder = new MediaRecorder(stream);
+        var mimeType = 'video/webm';
+        if(MediaRecorder.isTypeSupported('video/webm;codecs=h264')){
+            mimeType = 'video/webm;codecs=h264';
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')){
+            mimeType = 'video/webm;codecs=vp9';
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')){
+            mimeType = 'video/webm;codecs=vp8';
+        }
         recorder = new RecordRTCPromisesHandler(stream, {
             type: 'video',
             timeSlice: 5000,
-            mimeType: 'video/webm;',
+            mimeType: mimeType,
             ondataavailable: async function(blob) {
                 Dispatcher.sendObject(blob);
-                // var timeSinceStart = (new Date()).getTime() - startTime;
-                // let timeSinceStartMS = timeSinceStart;
-                // var secs = Math.floor(timeSinceStart/1000);
-                // var mins = Math.floor(secs/60);
-                // var hrs = Math.floor(mins/60);
-                // timeSinceStart = timeSinceStart - secs*1000;
-                // secs = secs - mins*60;
-                // mins = mins - hrs*60;
-                // // console.log("Time since start recording: " + hrs + ":" + mins +":" + secs +":" + timeSinceStart);
-                // let timeString = hrs + ":" + mins +":" + secs +"." + timeSinceStart;
-
-                // let eventDetails = {
-                //     timeSinceStartRecording: {
-                //         milliSeconds: timeSinceStartMS,
-                //         formatted: timeString
-                //     }
-                // };
-
-                // eventPackager.packageScreenCaptureEvent(eventDetails);
-        
-
             }
           });
 
         recorder.startRecording();  
-        // startTime = (new Date()).getTime(); 
     }
 
 
@@ -174,21 +155,6 @@ export default (function(root) {
         await recorder.stopRecording();
         stream.getVideoTracks()[0].stop();
     }
-
-    // start.addEventListener("click", () => {
-    //     start.setAttribute("disabled", true);
-    //     stop.removeAttribute("disabled");
-
-    //     startRecording();
-    // });
-
-    // stop.addEventListener("click", () => {
-    //     stop.setAttribute("disabled", true);
-    //     start.removeAttribute("disabled");
-
-    //     recorder.stop();
-    //     stream.getVideoTracks()[0].stop();
-    // });
 
     return _public;
 })(window);
