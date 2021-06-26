@@ -1,37 +1,27 @@
 # LogUI Client <a href="https://www.tudelft.nl"><img align="right" width="100" src="./.meta/tudelft.svg" /></a>
 
-**Welcome to LogUI!** *LogUI* is a powerful, framework-agnostic client-side JavaScript library that can be used for logging interactions that take place on a webpage. Primarily designed for *Interactive Information Retrieval (IIR)* experiments, LogUI can in theory be used on any page or site that you wish to track fine-grained user interactions with UI components.
+**Welcome to this LogUI expansion!** 
+This is an expansion of the [LogUI client library](https://github.com/logui-framework/client) This expansion adds screen capture functionality features to *LogUI*. 
 
-Use the LogUI client in tandem with the LogUI server. You can find the LogUI server living at [this repository](https://github.com/logui-framework/server/).
+  
 
-## About LogUI
+Use the LogUI client in tandem with the LogUI server. You can find the LogUI server expansion living at [this repository](https://github.com/hjpvandijk/server).
+  
 
-The LogUI library is implemented by [Dr David Maxwell](https://github.com/maxwelld90/), a postdoctoral researcher at [TUDelft](https://www.tudelft.nl/) in the Netherlands. It has been developed in the Lambda Lab, headed by [Dr Claudia Hauff](https://chauff.github.io/). The library is borne out of the need for infrastructure that allows one to undertake the logging of user interactions in a consistent way, rather than the piecemeal approach that we've seen in IIR experimentation.
+## About this expansion
 
-We think that a one-size-fits-all logging library is just the ticket for your experiments!
+This expansion of the LogUI library is implemented by [Hugo van Dijk](https://github.com/hjpvandijk), a student at [TUDelft](https://www.tudelft.nl/) in the Netherlands. 
 
-## Using LogUI in Experiments?
 
-We're thrilled that you're using LogUI in your experiments! We ask that in return you provide due credit for this work. If you have a paper associated with your experiment, please do cite the associated demonstration paper that was published at [ECIR 2021](https://www.ecir2021.eu/). You can find the BibTeX source for the paper below.
-
-```bibtex
-@inproceedings{maxwell2021logui,
-    author = {Maxwell, David and Hauff, Claudia},
-    title ="{LogUI: Contemporary Logging Infrastructure for Web-Based Experiments}",
-    booktitle = {Advances in Information Retrieval (Proc. ECIR)},
-    year = {2021},
-    pages = {525--530},
-}
-```
+  
 
 ## Documentation and Quick Start Guide
+For documentation on LogUI client library, please go and check out the [corresponding Wiki](https://github.com/logui-framework/client/wiki/) associated with the original LogUI client repository. There, you'll find detailed information about how to [acquire yourself a copy](https://github.com/logui-framework/client/wiki/Acquiring), how to [set the client library up](https://github.com/logui-framework/client/wiki/Quick-Start-Guide), how to integrate it with your existing application's code, and information which should allow you to gain a better understanding as to the thinking behind the library's implementation.
 
-For documentation on the LogUI client library, please go and check the corresponding Wiki associated with this repository. There, you'll find detailed information about how to [acquire yourself a copy](https://github.com/logui-framework/client/wiki/Acquiring), how to [set the client library up](https://github.com/logui-framework/client/wiki/Quick-Start-Guide), how to integrate it with your existing application's code, and information which should allow you to gain a better understanding as to the thinking behind the library's implementation.
+### Starting screen capturing
+Some browsers, like Mozilla Firefox, only allow screen recording when it is initiated by a user gesture handler, like a button click. So, the method ` window.LogUI.startScreenCapture()` should be called when a user clicks on a button, for example. When this method  is called, the user is prompted to select what area to share. After this has been selected, screen recording will start.
 
-## Tests
-
-Tests are being developed for the LogUI client library and will be available in this repository soon.
-
-## Found a Bug or have a Feature Request?
-
-It would be great to hear from you! Please [raise an issue in this repository](https://github.com/logui-framework/client/issues) and we can discuss what options that can be pursued to resolve it.
+ ## Recording settings
+ The [RecordRTC](https://recordrtc.org/) is used for recording the screen. By default the recordings are recorded with in 5 second intervals, and it will select the first codec supported by the browser in the order of: H.264, VP9, VP8. Bitrate is left up to the RecordRTC library, what presumably results in variable bitrate throughout the recording. 
+ 
+ Recording settings can be changed in the [main.js](https://github.com/hjpvandijk/client/blob/screen-capture/src/main.js) file. Here, you can set the recorder's parameters, like MIME type, timeSlice (recording interval), and bitrate. 
