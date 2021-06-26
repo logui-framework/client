@@ -24,4 +24,4 @@ Some browsers, like Mozilla Firefox, only allow screen recording when it is init
  ## Recording settings
  The [RecordRTC](https://recordrtc.org/) is used for recording the screen. By default the recordings are recorded with in 5 second intervals, and it will select the first codec supported by the browser in the order of: H.264, VP9, VP8. Bitrate is left up to the RecordRTC library, what presumably results in variable bitrate throughout the recording. 
  
- Recording settings can be changed in the [main.js](https://github.com/hjpvandijk/client/blob/screen-capture/src/main.js) file. Here, you can set the recorder's parameters, like MIME type, timeSlice (recording interval), and bitrate. 
+ Recording settings can be changed in the [main.js](https://github.com/hjpvandijk/client/blob/screen-capture/src/main.js) file. Here, you can set the recorder's parameters, like MIME type, timeSlice (recording interval), and bitsPerSecond (bitrate). 
