@@ -1,4 +1,4 @@
-# LogUI Client <a href="https://www.tudelft.nl"><img align="right" width="100" src="./.meta/tudelft.svg" /></a>
+# LogUI Client Expansion <a href="https://www.tudelft.nl"><img align="right" width="100" src="./.meta/tudelft.svg" /></a>
 
 **Welcome to this LogUI expansion!** 
 This is an expansion of the [LogUI client library](https://github.com/logui-framework/client) This expansion adds screen capture functionality features to *LogUI*. 
