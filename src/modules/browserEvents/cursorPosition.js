@@ -34,7 +34,7 @@ export default (function(root) {
                 _updateFrequency = configUpdateFrequencyValue;
             }
 
-            _trackLeaving = Config.browserEventsConfig.get('cursorLeavingPage', true)
+            _trackLeaving = Config.browserEventsConfig.get('cursorLeavingPage', true);
 
             root.document.addEventListener('mousemove', movementCallback);
 

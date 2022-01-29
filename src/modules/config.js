@@ -60,7 +60,7 @@ export default (function(root) {
 
         _applicationSpecificData = suppliedConfigObject.applicationSpecificData;
         _trackingConfig = suppliedConfigObject.trackingConfiguration;
-        _browserEvents = suppliedConfigObject.logUIConfiguration.browserEvents;
+        _browserEvents = suppliedConfigObject.browserEvents;
 
         return true;
     };
